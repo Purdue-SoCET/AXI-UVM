@@ -68,9 +68,11 @@ class master_axi_pipeline_driver extends uvm_driver;
 
 
     task set_write_data(master_transaction axi_m); 
+        // TODO Figure out what to do with these signals
         vmif.WSTRB = 0;
         vmif.WUSER = 0;
         vmif.WLAST = 0;
+        int idx = 0;
 
         repeat(axi_m.m_BURST_size) begin
             @(negedge vmif.ACLK);
@@ -78,6 +80,8 @@ class master_axi_pipeline_driver extends uvm_driver;
             while(!vmif.WREADY) begin
                 @(posedge vmif.ACLK); // wait till valid go high
             end
+
+            // NOTE can randomize when Valid goes high if need be 
             if(vmif.WREADY && vmif.WVALID) begin
                 if(idx == axi_m.m_BURST_size - 1) begin
                     vmif.WLAST = 1;
@@ -89,6 +93,7 @@ class master_axi_pipeline_driver extends uvm_driver;
                 vmif.WVALID = 0; // set low
             end
         end
+        #1; // pass some time
         if(vmif.WLAST = 1) vmif.WLAST = 0; // So I dont hold LAST high for too long
     endtask
 
@@ -143,6 +148,8 @@ class master_axi_pipeline_driver extends uvm_driver;
                 end
             end
         end
+
+        seq_item_port.item_done(); // item finishes 
     endtask
 
 endclass //master_axi_pipeline_driver extends uvm_driver
