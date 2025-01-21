@@ -5,9 +5,9 @@
 interface axi_master_if #( // MAY NOT NEED TO PARM
     parameter NUM_ID = NUM_ID,
     parameter NUM_USER = NUM_USER,
-    parameter DATA_LEN = DAT_LEN
+    parameter DATA_LEN = DAT_LEN // May get rid of TODO 1/20/25
 )
-(input logic ACLK, ARESETn);
+(input logic ACLK, ARESETn); // FLAG I do not think rst should be here but I will look into
 
 
 /////////////// WRITE ADDR CHANNEL/////////////////
@@ -101,7 +101,7 @@ clocking m_mon_cb @(posedge ACLK) // This makes sense inputs into the monitor ar
     WVALID, WLAST, WDATA, WSTRB, WUSER, BREADY, BUSER, 
     ARREADY, ARSIZE, ARBURST, ARCACHE, ARPROT, ARID, 
     ARLEN, ARLOCK, ARQOS, ARREGION, ARUSER, RREADY;
-    input AWREADY, WREADY, BVALID, BRESP, BID, ARVALID, 
+    output AWREADY, WREADY, BVALID, BRESP, BID, ARVALID, 
     RVALID, RDATA, RRESP, RID, RUSER;
 endclocking
 

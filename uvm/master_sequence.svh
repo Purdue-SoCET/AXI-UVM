@@ -1,7 +1,45 @@
 import uvm_pkg::*;
 `include "uvm_macros.svh"
 `include "master_transactions.svh"
+`include "master_params.svh"
+//////////////////////// SEQUENCER////////////////////////////////////////
+class master_sequencer extends uvm_sequencer #(master_transaction);
+    `uvm_component_utils(master_sequencer) // regstering with factory 
 
+    function new(input string name = "master_sequencer", uvm_component parent = null);
+        super.new(name,parent);
+    endfunction : new
+endclass 
+
+class master_sequence extends uvm_sequence #(master_transaction);
+    `uvm_object_utils(master_sequence);
+    
+    function new(string name = "master_sequence");
+        super.new(name);
+    endfunction: new
+
+    master_transaction axi_m; // the transaction
+
+    task AXI_MASTER_write(input master_transaction axi_m);
+        assert(axi_m.randomize with {axi_m.m_valid = 1, set_write(axi_m)})
+        else `uvm_fatal("re_trans sequence", "Not able to randomize");
+        start_item(axi_m);
+        finish_item(axi_m);
+    endtask
+
+    task AXI_MASTER_read(input master_transaction axi_m);
+        assert(axi_m.randomize with {axi_m.m_ready = 1, set_read(axi_m)})
+        else `uvm_fatal("re_trans sequence", "Not able to randomize");
+        start_item(axi_m);
+        finish_item(axi_m);
+    endtask
+
+    task body;
+        axi_m = master_transaction#(NUM_ID,NUM_USER,DAT_LEN):: type_id::create("req_item"); // Building  
+        // TODO ADD ALL TESTS
+    endtask 
+
+endclass
 /////////////////// BASE SEQUENCE/////////////////////////////
 class master_base_sequence extends uvm_sequence #(master_transaction);
     `uvm_object_utils(master_base_sequence);
@@ -231,14 +269,7 @@ endclass
 //     endtask
 // endclass
 
-//////////////////////// SEQUENCER////////////////////////////////////////
-class master_sequencer extends uvm_sequencer #(write_transaction,read_transaction,read_and_write_transaction);
-    `uvm_component_utils(master_sequencer) // regstering with factory 
 
-    function new(input string name = "master_sequencer", uvm_component parent = null);
-        super.new(name,parent);
-    endfunction : new
-endclass 
 
 
 
