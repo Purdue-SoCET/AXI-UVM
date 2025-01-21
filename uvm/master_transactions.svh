@@ -7,6 +7,7 @@ import uvm_pkg::*;
 
 class master_transaction #(parameter NUM_ID = NUM_ID, parameter NUM_USER = NUM_USER, parameter DAT_LEN = DAT_LEN) extends uvm_tlm_generic_payload; 
     rand Channel Channel;
+    rand logic [DAT_LEN - 1:0] m_data[]; // FLAG this field can be up to 1024 so I need to figure out how to test it maybe multiple diffrent tests
     rand bit nRST;
     rand bit m_ready;
     rand bit m_valid;
@@ -21,6 +22,7 @@ class master_transaction #(parameter NUM_ID = NUM_ID, parameter NUM_USER = NUM_U
 
 
 `uvm_object_utils_begin(master_transaction)
+    `uvm_field_array_int(m_data, UVM_NOCOMPARE)
     `uvm_field_int(Channel, UVM_NOCOMPARE)
     `uvm_field_int(nRST, UVM_NOCOMPARE)
     `uvm_field_int(ready, UVM_NOCOMPARE)
@@ -35,6 +37,26 @@ class master_transaction #(parameter NUM_ID = NUM_ID, parameter NUM_USER = NUM_U
     `uvm_field_int(m_byte_enable_length, UVM_NOCOMPARE)
 `uvm_object_utils_end
 
+    // Trying to keep track of what type of tranaction have been sent 
+    static bit addr_type_sent = 0;
+    static bit data_type_sent = 0;
+    static bit response_type_sent = 0;
+
+    constraint type_sent {
+        if(!addr_type_sent) begin
+            Channel != DATA;
+            Channel != RESPONSE;
+        end 
+
+        if(!data_type_sent) begin
+            Channel != RESPONSE;
+            Channel != DATA;
+        end
+
+        if(response_type_sent) begin
+            Channel == RESPONSE;
+        end
+    }
     constraint ready_valid {
         if(ready == 1) valid != 1;
         else if(valid == 1) ready != 1;
@@ -73,6 +95,26 @@ class master_transaction #(parameter NUM_ID = NUM_ID, parameter NUM_USER = NUM_U
         super.new(name);
     endfunction: new
     
+    function void update_state();
+        if(Channel == ADDRESS) begin
+            addr_type_sent = 1; // Mark addr type sent
+            data_type_sent = 0;
+            response_type_sent = 0;
+        end
+
+        else if(Channel == DATA) begin
+            addr_type_sent = 0;
+            data_type_sent = 1; // Mark data type sent
+            response_type_sent = 0;
+        end
+
+        else if(Channel == RESPONSE) begin
+            addr_type_sent = 0;
+            data_type_sent = 0; 
+            response_type_sent = 1; // Mark response type sent
+        end
+
+      endfunction
 endclass
 
 

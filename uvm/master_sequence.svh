@@ -21,14 +21,16 @@ class master_sequence extends uvm_sequence #(master_transaction);
     master_transaction axi_m; // the transaction
 
     task AXI_MASTER_write(input master_transaction axi_m);
-        assert(axi_m.randomize with {axi_m.m_valid = 1, set_write(axi_m)})
+        assert(axi_m.randomize with {axi_m.m_valid = 1, set_write(axi_m)});
+        axi_m.update_state(); // updates state
         else `uvm_fatal("re_trans sequence", "Not able to randomize");
         start_item(axi_m);
         finish_item(axi_m);
     endtask
 
     task AXI_MASTER_read(input master_transaction axi_m);
-        assert(axi_m.randomize with {axi_m.m_ready = 1, set_read(axi_m)})
+        assert(axi_m.randomize with {axi_m.m_ready = 1, set_read(axi_m)});
+        axi_m.update_state(); // updates state
         else `uvm_fatal("re_trans sequence", "Not able to randomize");
         start_item(axi_m);
         finish_item(axi_m);

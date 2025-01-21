@@ -13,5 +13,5 @@ parameter INCR = 1;
 parameter WRAP = 2;
 
 typedef enum bit[1:0] {READ, WRITE, READ_WRITE} TYPE_TRANS;
-typedef enum bit{ADDRESS, DATA} Channel; // May have to add (response need to see DUT)
+typedef enum bit [1:0] {ADDRESS, DATA, RESPONSE} Channel; // May have to add (response need to see DUT)
 `endif // MASTER_PARAMS_VH

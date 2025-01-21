@@ -26,6 +26,7 @@ logic AWLOCK;
 logic [3:0] AWQOS;
 logic [3:0] AWREGION;
 logic [NUM_USER- 1:0] AWUSER; // Todo look into size
+// logic [DAT_LEN - 1:0] m_data[];
 
 
 /////////////// WRITE DATA CHANNEL/////////////////
@@ -34,7 +35,7 @@ logic WREADY;
 // OUTPUTS
 logic WVALID;
 logic WLAST;
-logic [DATA_LEN- 1:0] WDATA;
+logic [DATA_LEN- 1:0] WDATA [];
 logic [x:0] WSTRB; // Todo figure out len
 logic [NUM_ID - 1: 0] WUSER; // Todo look into size
 
@@ -68,7 +69,7 @@ logic [NUM_USER- 1:0] ARUSER; // Todo look into size
 // INPUTS
 logic RVALID;
 logic RLAST;
-logic [DATA_LEN- 1:0] RDATA;
+logic [DATA_LEN - 1:0] RDATA [];
 logic [1:0] RRESP;
 logic [NUM_ID - 1:0] RID;
 logic [NUM_ID - 1: 0] RUSER; // Todo look into size
@@ -87,7 +88,7 @@ clocking m_drv_cb @(posedge ACLK)
     output AWVALID, AWADDR, AWSIZE, AWBURST, AWCACHE, AWPROT,
     AWID, AWLEN, AWLOCK, AWQOS, AWREGION, AWUSER,
     WVALID, WLAST, WDATA, WSTRB, WUSER, BREADY, BUSER, 
-    ARREADY, ARSIZE, ARBURST, ARCACHE, ARPROT, ARID, 
+    ARREADY, ARADDR, ARSIZE, ARBURST, ARCACHE, ARPROT, ARID, 
     ARLEN, ARLOCK, ARQOS, ARREGION, ARUSER, RREADY;
 
     input AWREADY, WREADY, BVALID, BRESP, BID, ARVALID, 
@@ -99,7 +100,7 @@ clocking m_mon_cb @(posedge ACLK) // This makes sense inputs into the monitor ar
     input AWVALID, AWADDR, AWSIZE, AWBURST, AWCACHE, AWPROT,
     AWID, AWLEN, AWLOCK, AWQOS, AWREGION, AWUSER,
     WVALID, WLAST, WDATA, WSTRB, WUSER, BREADY, BUSER, 
-    ARREADY, ARSIZE, ARBURST, ARCACHE, ARPROT, ARID, 
+    ARREADY, ARADDR, ARSIZE, ARBURST, ARCACHE, ARPROT, ARID, 
     ARLEN, ARLOCK, ARQOS, ARREGION, ARUSER, RREADY;
     output AWREADY, WREADY, BVALID, BRESP, BID, ARVALID, 
     RVALID, RDATA, RRESP, RID, RUSER;
