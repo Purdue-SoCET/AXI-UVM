@@ -25,7 +25,7 @@ logic [7:0] AWLEN;
 logic AWLOCK;
 logic [3:0] AWQOS;
 logic [3:0] AWREGION;
-logic [NUM_USER- 1:0] AWUSER; // Todo look into size
+logic [NUM_USER - 1:0] AWUSER; // Todo look into size
 // logic [DAT_LEN - 1:0] m_data[];
 
 
@@ -39,6 +39,8 @@ logic [DATA_LEN- 1:0] WDATA [];
 logic [x:0] WSTRB; // Todo figure out len
 logic [NUM_ID - 1: 0] WUSER; // Todo look into size
 
+// Signals needed for UVM TB
+logic [DATA_LEN- 1:0] WCDATA []; // Write Check data
 /////////////// WRITE RESPONSE CHANNEL/////////////////
 // INPUTS
 logic BVALID;
@@ -87,29 +89,45 @@ between the clock and the signals"
 clocking m_drv_cb @(posedge ACLK)
     output AWVALID, AWADDR, AWSIZE, AWBURST, AWCACHE, AWPROT,
     AWID, AWLEN, AWLOCK, AWQOS, AWREGION, AWUSER,
-    WVALID, WLAST, WDATA, WSTRB, WUSER, BREADY, BUSER, 
-    ARREADY, ARADDR, ARSIZE, ARBURST, ARCACHE, ARPROT, ARID, 
+    WVALID, WLAST, WDATA, WSTRB, WUSER, BREADY, 
+    ARADDR, ARSIZE, ARBURST, ARCACHE, ARPROT, ARID, 
     ARLEN, ARLOCK, ARQOS, ARREGION, ARUSER, RREADY;
 
-    input AWREADY, WREADY, BVALID, BRESP, BID, ARVALID, 
-    RVALID, RDATA, RRESP, RID, RUSER;
+    input AWREADY, WREADY, BVALID, BRESP, BID, ARVALID, BUSER, ARREADY 
+    RVALID, RDATA, RRESP, RID, RUSER, RVALID;
 endclocking
 
 //  monitor clocking block
 clocking m_mon_cb @(posedge ACLK) // This makes sense inputs into the monitor are outputs of DUT
     input AWVALID, AWADDR, AWSIZE, AWBURST, AWCACHE, AWPROT,
     AWID, AWLEN, AWLOCK, AWQOS, AWREGION, AWUSER,
-    WVALID, WLAST, WDATA, WSTRB, WUSER, BREADY, BUSER, 
-    ARREADY, ARADDR, ARSIZE, ARBURST, ARCACHE, ARPROT, ARID, 
+    WVALID, WLAST, WDATA, WSTRB, WUSER, BREADY, 
+    ARADDR, ARSIZE, ARBURST, ARCACHE, ARPROT, ARID, 
     ARLEN, ARLOCK, ARQOS, ARREGION, ARUSER, RREADY;
-    output AWREADY, WREADY, BVALID, BRESP, BID, ARVALID, 
-    RVALID, RDATA, RRESP, RID, RUSER;
+    
+    output AWREADY, WREADY, BVALID, BRESP, BID, ARVALID, BUSER, ARREADY 
+    RVALID, RDATA, RRESP, RID, RUSER, RVALID;
 endclocking
 
 modport MDRV(m_drv_cb, input ARESETn);
 modport MMON(m_mon_cb, input ARESETn);
 
 // TODO ADD ASSERTIONS WHEN I KNOW THE SPECIFICATIONS OF THE DUT
+property nrst_success;
+    (@(m_mon_cb) $fell(nRST) |=> (AWVALID == 0 && AWSIZE == 0 && AWBURST == 0 && AWCACHE == 0 &&
+    AWPROT == 0 && AWID == 0 && AWLEN == 0 && AWLOCK == 0 && AWQOS == 0 && AWREGION == 0 && AWUSER == 0 &&
+    WVALID == 0 && WLAST == 0 && WDATA == '1 && WSTRB == 0 && WUSER == 0 &&
+    ARADDR == 0 && ARSIZE == 0 && ARBURST == 0 && ARCACHE == 0 && ARPROT == 0 && ARID == 0 && ARLEN == 0 &&
+    ARLOCK == 0 && ARQOS == 0 && ARREGION == 0 && ARUSER == 0 && RREADY == 0));
+endproperty 
+
+// nRST correct
+assert property (nrst_success) begin
+    `uvm_info("sva", $sformatf("Test Case: nRST0 : PASSED"), UVM_LOW)
+end 
+else begin
+    `uvm_info("sva", $sformatf("Test Case: nRST0 : FAILED, @ Time : %0t"), UVM_HIGH, $timeformat(-9, 2, "ns", 20))
+end
 
 
 

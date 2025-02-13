@@ -1,40 +1,56 @@
 `ifndef MASTER_TRANSACTIONS
 `define MASTER_TRANSACTIONS
+
+
 import uvm_pkg::*;
 `include "uvm_macros.svh"
 `include "master_params.svh"
 
 
-class master_transaction #(parameter NUM_ID = NUM_ID, parameter NUM_USER = NUM_USER, parameter DAT_LEN = DAT_LEN) extends uvm_tlm_generic_payload; 
-    rand Channel Channel;
-    rand logic [DAT_LEN - 1:0] m_data[]; // FLAG this field can be up to 1024 so I need to figure out how to test it maybe multiple diffrent tests
+class master_transaction #(parameter NUM_ID = NUM_ID, parameter NUM_USER = NUM_USER, parameter DAT_LEN = DAT_LEN) extends uvm_sequence_item; 
+
+    // For now I am asuming these are all inputs 
+    rand TYPE_CHANNEL Channel; // channel (addr,write/read,resp)
+    rand logic [31:0] address; // addr
+    rand TYPE_TRANS command; // type of transaction(read or write)
+    rand logic [DAT_LEN - 1:0] data[]; // FLAG this field can be up to 1024 so I need to figure out how to test it maybe multiple diffrent tests
+    rand logic [3:0] BURST_length; // how many transfers per transaction
     rand bit nRST;
-    rand bit m_ready;
-    rand bit m_valid;
-    rand bit [1:0] m_BURST;
-    rand bit [3:0] m_CACHE;
-    rand bit m_LOCK;
-    rand bit [31:0] m_address;
-    rand bit [1:0] m_BURST_type;
-    rand bit [2:0] m_BURST_size;
-    rand bit [2:0] m_streaming_width;
-    rand bit [3:0] m_byte_enable_length;
+    rand bit ready;
+    rand bit valid;
+    rand bit TYPE_BURST BURST_type;
+    rand bit [3:0] CACHE;
+    rand bit LOCK;
+    rand bit [2:0] BURST_size; // how many bites per transfer
+    rand bit [2:0] prot; // normal vs privelaged protection and secure vs non secure 
+
+    // Outputs tbd
+    logic [DAT_LEN - 1:0] out_data[]; // data outputed
+    logic [31:0] out_addr; // addr outputed
+    TYPE_RESP out_resp; // response
 
 
 `uvm_object_utils_begin(master_transaction)
-    `uvm_field_array_int(m_data, UVM_NOCOMPARE)
+    //inputs 
     `uvm_field_int(Channel, UVM_NOCOMPARE)
+    `uvm_field_int(address, UVM_NOCOMPARE)
+    `uvm_field_int(command, UVM_NOCOMPARE)
+    `uvm_field_array_int(data, UVM_NOCOMPARE)
+    `uvm_field_int(BURST_length, UVM_NOCOMPARE)
     `uvm_field_int(nRST, UVM_NOCOMPARE)
     `uvm_field_int(ready, UVM_NOCOMPARE)
     `uvm_field_int(valid, UVM_NOCOMPARE)
-    `uvm_field_int(m_BURST, UVM_NOCOMPARE)
-    `uvm_field_int(m_CACHE, UVM_NOCOMPARE)
-    `uvm_field_int(m_LOCK, UVM_NOCOMPARE)
-    `uvm_field_int(m_address, UVM_NOCOMPARE)
-    `uvm_field_int(m_BURST_type, UVM_NOCOMPARE)
-    `uvm_field_int(m_BURST_size, UVM_NOCOMPARE)
-    `uvm_field_int(m_streaming_width, UVM_NOCOMPARE)
-    `uvm_field_int(m_byte_enable_length, UVM_NOCOMPARE)
+    `uvm_field_int(BURST_type, UVM_NOCOMPARE)
+    `uvm_field_int(CACHE, UVM_NOCOMPARE)
+    `uvm_field_int(LOCK, UVM_NOCOMPARE)
+    `uvm_field_int(BURST_size, UVM_NOCOMPARE)
+    `uvm_field_int(prot, UVM_NOCOMPARE)
+    
+    // Outputs 
+    `uvm_field_array_int(out_data, UVM_DEFAULT)
+    `uvm_field_int(out_addr, UVM_DEFAULT)
+    `uvm_field_int(out_resp, UVM_DEFAULT)
+
 `uvm_object_utils_end
 
     // Trying to keep track of what type of tranaction have been sent 
@@ -42,18 +58,25 @@ class master_transaction #(parameter NUM_ID = NUM_ID, parameter NUM_USER = NUM_U
     static bit data_type_sent = 0;
     static bit response_type_sent = 0;
 
-    constraint type_sent {
+      constraint type_sent {
+        Channel != WDONE // need this in monitor for now
+        Channel != RDONE // need this in monitor for now
+        /*
+        Order in which data must be sent for each ID
+        1.ADDR
+        2.DATA
+        3.RESPONSE    
+        */
+
         if(!addr_type_sent) begin
-            Channel != DATA;
-            Channel != RESPONSE;
+            Channel == ADDRESS; 
         end 
 
-        if(!data_type_sent) begin
-            Channel != RESPONSE;
-            Channel != DATA;
+        if(!data_type_sent & addr_type_sent ) begin
+            Channel == DATA;
         end
 
-        if(response_type_sent) begin
+        if(addr_type_sent & data_type_sent) begin
             Channel == RESPONSE;
         end
     }
@@ -61,22 +84,22 @@ class master_transaction #(parameter NUM_ID = NUM_ID, parameter NUM_USER = NUM_U
         if(ready == 1) valid != 1;
         else if(valid == 1) ready != 1;
 
-        if(Channel == ADDRESS || ((Channel == DATA) && m_command == UVM_TLM_WRITE_COMMAND)) begin
+        if(Channel == ADDRESS || ((Channel == DATA) && command == WRITE)) begin
             ready != 1;
         end
 
-        if(Channel == DATA && (m_command == UVM_TLM_READ_COMMAND)) begin
+        if(Channel == DATA && (command == READ)) begin
             valid != 1;
         end    
     }
     
     constraint bursts {
-        if(m_BURST_type == WRAP)
-            m_BURST_size inside {3'b001,3'b010,3'b011,3'b100};
+        if(BURST_type == WRAP)
+            BURST_size inside {3'b001,3'b010,3'b011,3'b100};
     }
 
     constraint cache {
-        m_CACHE inside {4'b0000, 4'b0001, 4'b0010, 4'b0011, 
+        CACHE inside {4'b0000, 4'b0001, 4'b0010, 4'b0011, 
         4'b0110, 4'b0111, 4'b1010, 4'b1011, 4'b1110, 4'b1111};
     }
 
@@ -84,10 +107,11 @@ class master_transaction #(parameter NUM_ID = NUM_ID, parameter NUM_USER = NUM_U
         Channel inside {ADDRESS, DATA};
     }
 
-    constraint byte_enable {
-        m_byte_enable == '1; // do not want to lose any bytes yet
-        m_byte_enable_length == m_length; // Made them both equal to eachh other 
-    }
+    // Gone because not using payload type to simplify life
+    // constraint byte_enable {
+    //     m_byte_enable == '1; // do not want to lose any bytes yet
+    //     m_byte_enable_length == m_length; // Made them both equal to eachh other 
+    // }
 
 
     
@@ -103,7 +127,7 @@ class master_transaction #(parameter NUM_ID = NUM_ID, parameter NUM_USER = NUM_U
         end
 
         else if(Channel == DATA) begin
-            addr_type_sent = 0;
+            addr_type_sent = 1;
             data_type_sent = 1; // Mark data type sent
             response_type_sent = 0;
         end
@@ -111,7 +135,7 @@ class master_transaction #(parameter NUM_ID = NUM_ID, parameter NUM_USER = NUM_U
         else if(Channel == RESPONSE) begin
             addr_type_sent = 0;
             data_type_sent = 0; 
-            response_type_sent = 1; // Mark response type sent
+            response_type_sent = 0; // Mark response type sent
         end
 
       endfunction

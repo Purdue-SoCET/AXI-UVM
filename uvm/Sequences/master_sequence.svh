@@ -2,7 +2,9 @@ import uvm_pkg::*;
 `include "uvm_macros.svh"
 `include "master_transactions.svh"
 `include "master_params.svh"
+
 //////////////////////// SEQUENCER////////////////////////////////////////
+// Generic sequencer
 class master_sequencer extends uvm_sequencer #(master_transaction);
     `uvm_component_utils(master_sequencer) // regstering with factory 
 

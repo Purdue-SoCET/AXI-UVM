@@ -1,31 +1,164 @@
 import uvm_pkg::*;
 `include "uvm_macros.svh"
-`include "axi_master_if.vh" // interface added
+`include "axi_master_if.svh" // interface added
+`include "master_params.svh"
 
 class master_monitor extends uvm_monitor;
     `uvm_component_utils(master_monitor)
 
-    virtual axi_master_if#(NUM_ID,NUM_USER,DATA_LEN)).MMON vif;
-    master_transaction#(NUM_ID,NUM_USER,DATA_LEN) re_trans,wr_trans;
-    uvm_analysis_port#(master_base_sequence) result_ap; // Result from DUT to COMP
-    uvm_analysis_port#(master_base_sequence) axi_ap; // Result from DUT to Predictor
-    master_transaction prev_tx; // Previous transaction
+    virtual axi_master_if.MMON vmif;
+
+    // Commented out because I do not think I need this since I can not really predict
+    // uvm_analysis_port#(master_transaction) axi_ap; // Result from DUT to Predictor
+
+    uvm_analysis_port#(master_transaction) result_ap; // Result from DUT to COMP
+    master_transaction item; // Previous transaction
 
     function new(string name, uvm_component parent = null);
         super.new(name,parent);
-        axi_ap = new("axi_ap",this);
         result_ap = new("result_ap",this);
     endfunction //new()
 
     virtual function void build_phase(uvm_phase phase);
         super.build_phase(phase); 
         // get interface from upper level
-        if(!uvm_config_db#(virtual axi_master_if#((NUM_ID,NUM_USER,DATA_LEN)).MMON)::get(this,"","MMON",vif)) begin
+        if(!uvm_config_db#(virtual axi_master_if)::get(this,"","MMON",vmif)) begin
             `uvm_fatal("Monitor", "No virtual interface specified for the monitor instance")
         end
     endfunction
 
-    task void write_monitor();
+    virtual task run_phase(uvm_phase phase);
+        super.run_phase(phase);
+
+        `uvm_info("MONITOR CLASS", "Run Phase", UVM_HIGH)
+        forever begin
+            item = master_transaction#(NUM_ID,NUM_USER,DAT_LEN)::type_id::create("item");
+
+            item.nRST = vmif.nRST;
+            @(posedge vmif.ACLK);
+
+            // if Read addr
+            if(vmif.ARVALID & vmif.ARREADY) begin              
+                // inputs (TECHNICALLY OUTS ALSO NEED TO LOOK INTO)
+                item.address = vmif.ARADDR;
+                item.command = READ;
+                item.data = '0; // no data on the read addr channel
+                item.BURST_length = vmif.ARLEN;
+                item.ready = vmif.ARREADY;
+                item.valid = vmif.ARVALID;
+                item.BURST_type = vmif.ARBURST;
+                item.CACHE = vmif.ARCACHE;
+                item.LOCK = vmif.ARLOCK;
+                item.BURST_size = vmif.ARSIZE;
+                item.prot = vmif.ARPROT;
+
+                // outputs 
+                item.out_data = '0; // no data its an addr channel
+                item.out_addr = vmif.ARADDR; // addr is an output 
+                item.out_resp = 0; // not used here
+            end
+
+            // if write addr
+            if(vmif.AWVALID & vmif.AWREADY) begin              
+                // inputs (TECHNICALLY OUTS ALSO NEED TO LOOK INTO)
+                item.address = vmif.AWADDR;
+                item.command = WRITE;
+                item.data = '0; // no data on the write addr channel
+                item.BURST_length = vmif.AWLEN;
+                item.ready = vmif.AWREADY;
+                item.valid = vmif.AWVALID;
+                item.BURST_type = vmif.AWBURST;
+                item.CACHE = vmif.AWCACHE;
+                item.LOCK = vmif.AWLOCK;
+                item.BURST_size = vmif.AWSIZE;
+                item.prot = vmif.AWPROT;
+
+                // outputs 
+                item.out_data = '0; // no data its an addr channel
+                item.out_addr = vmif.AWADDR; // addr is an output 
+                item.out_resp = 0; // not used here
+            end
+
+            // READ DATA
+            if(vmif.RVALID & vmif.RREADY) begin
+                item.address = 0; // not relevant
+                item.command = READ;
+                item.Channel = DATA;
+                item.data = 0; // irrelevant
+                item.out_data[0] = vmif.RDATA;
+                item.BURST_length = vmif.ARLEN; // TODO tricky logic gere not simple come back to this 
+                item.ready = vmif.RREADY;
+                item.valid = vmif.RVALID;
+                item.BURST_type = vmif.ARBURST; // not sure what to do with this field
+                item.CACHE = vmif.ARCACHE; // not sure
+                item.LOCK = vmif.ARLOCK; // not sure
+                item.BURST_size = vmif.ARSIZE; // not sure
+                item.prot = vmif.ARPROT; // not sure
+            end
+
+            if(item.command == READ && item.Channel == DATA) begin
+                int idx = 1;
+                repeat(vmif.BURST_length) begin
+                    while(!vmif.RVALID && !vmif.RREADY) begin
+                        @(posedge vmif.ACLK); // wait till valid go high
+                    end
+
+                    item.out_data[idx] = vmif.RDATA;
+
+                    if(idx == vmif.BURST_length - 1) begin
+                        item.Channel = RDONE; // needed so I do not get stuck in if construct
+                        break; // kill the loop 
+                    end
+                end
+            end
+
+
+            // WRITE DATA
+            if(vmif.WVALID & vmif.WREADY) begin
+                item.address = 0; // not relevant
+                item.command = WRITE;
+                item.Channel = DATA;
+                item.data[0] = vmif.WDATA;
+                item.BURST_length = vmif.AWLEN; // TODO tricky logic gere not simple come back to this 
+                item.ready = vmif.WREADY;
+                item.valid = vmif.WVALID;
+                item.BURST_type = vmif.AWBURST; // not sure what to do with this field
+                item.CACHE = vmif.AWCACHE; // not sure
+                item.LOCK = vmif.AWLOCK; // not sure
+                item.BURST_size = vmif.AWSIZE; // not sure
+                item.prot = vmif.AWPROT; // not sure
+            end
+
+            if(item.command == WRITE && item.Channel == DATA) begin
+                int idx = 1;
+                repeat(vmif.BURST_length) begin
+                    while(!vmif.WVALID && !vmif.WREADY) begin
+                        @(posedge vmif.ACLK); // wait till valid go high
+                    end
+
+                    item.out_data[idx] = vmif.WDATA;
+
+                    if(idx == vmif.BURST_length - 1) begin
+                        item.Channel = WDONE; // needed so I do not get stuck in if construct
+                        break; // kill the loop 
+                    end
+                end
+            end
+
+            result_ap.write(item); // write to SB
+        end
+        
+    endtask : run_phase
+
+   
+endclass //master_monitor
+
+
+
+
+// OLD CODE MAY NEED LATER 
+/*
+ task void write_monitor();
         if(vif.m_mon_cb.AWVALID && vif.m_mon_cb.AWREADY) begin // READY from slave
             wr_trans = master_transaction#(NUM_ID,NUM_USER,DATA_LEN)::type_id::create("wr_trans"); // Making write transaction
             wr_trans.AWREADY = vif.m_mon_cb.AWREADY;
@@ -82,4 +215,4 @@ class master_monitor extends uvm_monitor;
         // PICK UP HERE
         
     endtask //
-endclass //master_monitor extends uvm_monitor
+*/
