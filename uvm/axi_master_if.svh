@@ -35,12 +35,12 @@ logic WREADY;
 // OUTPUTS
 logic WVALID;
 logic WLAST;
-logic [DATA_LEN- 1:0] WDATA [];
+logic [DATA_LEN- 1:0] WDATA ;
 logic [x:0] WSTRB; // Todo figure out len
 logic [NUM_ID - 1: 0] WUSER; // Todo look into size
 
 // Signals needed for UVM TB
-logic [DATA_LEN- 1:0] WCDATA []; // Write Check data
+// logic [DATA_LEN- 1:0] WCDATA []; // Write Check data
 /////////////// WRITE RESPONSE CHANNEL/////////////////
 // INPUTS
 logic BVALID;
@@ -71,7 +71,7 @@ logic [NUM_USER- 1:0] ARUSER; // Todo look into size
 // INPUTS
 logic RVALID;
 logic RLAST;
-logic [DATA_LEN - 1:0] RDATA [];
+logic [DATA_LEN - 1:0] RDATA;
 logic [1:0] RRESP;
 logic [NUM_ID - 1:0] RID;
 logic [NUM_ID - 1: 0] RUSER; // Todo look into size
@@ -90,27 +90,27 @@ clocking m_drv_cb @(posedge ACLK)
     output AWVALID, AWADDR, AWSIZE, AWBURST, AWCACHE, AWPROT,
     AWID, AWLEN, AWLOCK, AWQOS, AWREGION, AWUSER,
     WVALID, WLAST, WDATA, WSTRB, WUSER, BREADY, 
-    ARADDR, ARSIZE, ARBURST, ARCACHE, ARPROT, ARID, 
+    ARADDR, ARSIZE, ARBURST, ARCACHE, ARPROT, ARID, ARREADY, 
     ARLEN, ARLOCK, ARQOS, ARREGION, ARUSER, RREADY;
 
-    input AWREADY, WREADY, BVALID, BRESP, BID, ARVALID, BUSER, ARREADY 
+    input AWREADY, WREADY, BVALID, BRESP, BID, ARVALID, BUSER,
     RVALID, RDATA, RRESP, RID, RUSER, RVALID;
 endclocking
 
-//  monitor clocking block
-clocking m_mon_cb @(posedge ACLK) // This makes sense inputs into the monitor are outputs of DUT
-    input AWVALID, AWADDR, AWSIZE, AWBURST, AWCACHE, AWPROT,
-    AWID, AWLEN, AWLOCK, AWQOS, AWREGION, AWUSER,
-    WVALID, WLAST, WDATA, WSTRB, WUSER, BREADY, 
-    ARADDR, ARSIZE, ARBURST, ARCACHE, ARPROT, ARID, 
-    ARLEN, ARLOCK, ARQOS, ARREGION, ARUSER, RREADY;
+// //  monitor clocking block
+// clocking m_mon_cb @(posedge ACLK) // This makes sense inputs into the monitor are outputs of DUT
+//     input AWVALID, AWADDR, AWSIZE, AWBURST, AWCACHE, AWPROT,
+//     AWID, AWLEN, AWLOCK, AWQOS, AWREGION, AWUSER,
+//     WVALID, WLAST, WDATA, WSTRB, WUSER, BREADY, 
+//     ARADDR, ARSIZE, ARBURST, ARCACHE, ARPROT, ARID, ARREADY, 
+//     ARLEN, ARLOCK, ARQOS, ARREGION, ARUSER, RREADY;
     
-    output AWREADY, WREADY, BVALID, BRESP, BID, ARVALID, BUSER, ARREADY 
-    RVALID, RDATA, RRESP, RID, RUSER, RVALID;
-endclocking
+//     output AWREADY, WREADY, BVALID, BRESP, BID, ARVALID, BUSER,
+//     RVALID, RDATA, RRESP, RID, RUSER, RVALID;
+// endclocking
 
-modport MDRV(m_drv_cb, input ARESETn);
-modport MMON(m_mon_cb, input ARESETn);
+// modport MDRV(m_drv_cb, input ARESETn);
+// modport MMON(m_mon_cb, input ARESETn);
 
 // TODO ADD ASSERTIONS WHEN I KNOW THE SPECIFICATIONS OF THE DUT
 property nrst_success;

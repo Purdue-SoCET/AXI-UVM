@@ -49,7 +49,7 @@ class garbage_sequence extends uvm_sequence;
         // --- Randomize With Reset --- //
         garbage_seqit = master_transactions::type_id::create("garbage_seqit");
         start_item(rgarbage_seqit);
-        garbage_seqit.randomize() with {nRST == 0;};
+        garbage_seqit.randomize() with {nRST == 1;};
         finish_item(garbage_seqit);
     endtask : body 
 

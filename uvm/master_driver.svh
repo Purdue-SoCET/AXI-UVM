@@ -50,7 +50,7 @@ class master_axi_pipeline_driver extends uvm_driver;
         vmif.ARSIZE <= axi_m.BURST_size;
         vmif.ARBURST <= axi_m.BURST_type;
         vmif.ARCACHE <= axi_m.CACHE;
-        vmif.ARPROT <= 0; // TODO Need to not make this 0
+        vmif.ARPROT <= axi_m.PROT;
         vmif.ARID <= 0; // TODO NEED TO NOT MAKE THIS 0
         vmif.ARLEN <= axi_m.BURST_length;
         vmif.ARLOCK <= axi_m.LOCK;
@@ -105,19 +105,7 @@ class master_axi_pipeline_driver extends uvm_driver;
         end
     endtask
 
-    // TODO THINK IT WILL BE IN MONITOR 
-    // task recieve_read_data(master_transaction axi_m); // TODO come back need to think how to check read data somehow
-    //     vmif.RREADY = 1; // set high at beginning
-    //     int idx = 0; 
-    //     repeat(axi_m.BURST_size) begin
-    //         while(!vmif.RVALID) begin
-    //             @(posedge vmif.ACLK); // wait till valid go high
-    //         end
-    //         if(vmif.RREADY && vmif.RVALID) begin
-                
-    //         end
-    //     end
-    // endtask
+  
 
     task run_phase(uvm_phase phase);
         `uvm_info("DRIVER CLASS", "Run Phase", UVM_HIGH)
@@ -162,3 +150,33 @@ class master_axi_pipeline_driver extends uvm_driver;
     endtask
 
 endclass //master_axi_pipeline_driver extends uvm_driver
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // TODO THINK IT WILL BE IN MONITOR 
+    // task recieve_read_data(master_transaction axi_m); // TODO come back need to think how to check read data somehow
+    //     vmif.RREADY = 1; // set high at beginning
+    //     int idx = 0; 
+    //     repeat(axi_m.BURST_size) begin
+    //         while(!vmif.RVALID) begin
+    //             @(posedge vmif.ACLK); // wait till valid go high
+    //         end
+    //         if(vmif.RREADY && vmif.RVALID) begin
+                
+    //         end
+    //     end
+    // endtask

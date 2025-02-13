@@ -137,8 +137,8 @@ class master_transaction #(parameter NUM_ID = NUM_ID, parameter NUM_USER = NUM_U
             data_type_sent = 0; 
             response_type_sent = 0; // Mark response type sent
         end
-
       endfunction
+      
 endclass
 
 
