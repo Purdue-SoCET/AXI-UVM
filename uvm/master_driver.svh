@@ -1,8 +1,9 @@
 // Currently non Pipelined driver TODO PIPELINED DRIVER 
-import uvm_pkg::*;
 `include "uvm_macros.svh"
+import uvm_pkg::*;
+
 `include "axi_master_if.svh" // interface added
-`include "master_params.svh"
+`include "master_seqit.svh"
 
 /* Key Issues 
 1. Need to Figure out how I am going to verfiy responses - Pending
@@ -27,12 +28,13 @@ import uvm_pkg::*;
 /* TODO
 1. Need to make this a pipelined driver so it can send transactions without waiting for other
    transactions to complete
-
 */
 
 class master_axi_pipeline_driver extends uvm_driver;
     `uvm_component_utils(master_axi_pipeline_driver)
-    virtual axi_master_if.m_drv_cb vmif;
+    virtual axi_master_if vmif;
+
+    master_seqit pkt;
 
     function new(string name, uvm_component parent = null);
         super.new(name,parent);
@@ -45,8 +47,9 @@ class master_axi_pipeline_driver extends uvm_driver;
         end
     endfunction : build_phase
 
-    task set_read_addr(master_transaction axi_m); 
+    task set_read_addr(master_seqit axi_m); 
         vmif.ARVALID <= 1'b1;
+        vmif.ARREADY <= 1'b1; // should be correct but not actual DUT
         vmif.ARSIZE <= axi_m.BURST_size;
         vmif.ARBURST <= axi_m.BURST_type;
         vmif.ARCACHE <= axi_m.CACHE;
@@ -60,7 +63,7 @@ class master_axi_pipeline_driver extends uvm_driver;
     endtask
 
     // PICK UP HERE
-    task set_write_addr(master_transaction axi_m); 
+    task set_write_addr(master_seqit axi_m); 
         vmif.AWVALID <= 1'b1;
         vmif.AWADDR <= axi_m.address;
         vmif.AWSIZE <= axi_m.BURST_size;
@@ -76,18 +79,19 @@ class master_axi_pipeline_driver extends uvm_driver;
     endtask
 
 
-    task set_write_data(master_transaction axi_m); 
+    task set_write_data(master_seqit axi_m); 
         // TODO Figure out what to do with these signals
-        vmif.WSTRB = 0;
-        vmif.WUSER = 0;
-        vmif.WLAST = 0;
-        int idx = 0;
+        vmif.WSTRB <= 0;
+        vmif.WUSER <= 0;
+        vmif.WLAST <= 0;
+        
 
-        repeat(axi_m.BURST_length) begin
-            @(negedge vmif.ACLK);
+        for (int idx = 0; idx < axi_m.BURST_length; idx++) begin
+
+            @(vmif.m_drv_cb);
             vmif.WVALID = 1; // set high at beginning
             while(!vmif.WREADY) begin
-                @(posedge vmif.ACLK); // wait till valid go high
+                @(vmif.m_drv_cb); // wait till valid go high
             end
 
             // NOTE can randomize when Valid goes high if need be 
@@ -98,41 +102,45 @@ class master_axi_pipeline_driver extends uvm_driver;
                 vmif.WDATA[idx] = axi_m.data[idx];
                 idx++;
 
-                @(negedge vmif.ACLK);
+                @(vmif.m_drv_cb);
                 vmif.WVALID = 0; // set low
-                if(vmif.WLAST = 1) vmif.WLAST = 0; // So I dont hold LAST high for too long
+                    if(vmif.WLAST == 1) vmif.WLAST = 0; // So I dont hold LAST high for too long
+                end
             end
-        end
-    endtask
+        
+        endtask
 
-  
+    
 
-    task run_phase(uvm_phase phase);
-        `uvm_info("DRIVER CLASS", "Run Phase", UVM_HIGH)
-        forever begin
-            seq_item_port.get_next_item(axi_m);
+        task run_phase(uvm_phase phase);
+            `uvm_info("DRIVER CLASS", "Run Phase", UVM_HIGH)
+    
+            forever begin
+            pkt = master_seqit#(DATA_WIDTH)::type_id::create("pkt");
+
+            seq_item_port.get_next_item(pkt);
 
             // ADDRESS CHANNEL Being Driven
-            if(axi_m.Channel == ADDRESS) begin
+            if(pkt.Channel == ADDRESS) begin
                 // READ Address Channel
-                if(axi_m.command == READ) begin
-                    vmif.ARVALID = 1'b1;
+                if(pkt.command == READ) begin
+                    vmif.ARVALID <= 1'b1;
                     while(!vmif.ARREADY) begin
-                        @(posedge vmif.ACLK); // Pass time until slave is ready 
+                        @(vmif.m_drv_cb); // Pass time until slave is ready 
                     end 
                     if(vmif.ARVALID && vmif.ARREADY) begin
-                        set_read_addr(axi_m); // sets interfacee
+                        set_read_addr(pkt); // sets interfacee
                     end
                 end
 
                 // Write Address Channel
-                else if(axi_m.command == WRITE) begin
-                    vmif.AWVALID = 1'b1;
+                else if(pkt.command == WRITE) begin
+                    vmif.AWVALID <= 1'b1;
                     while(!vmif.AWREADY) begin
-                        @(posedge vmif.ACLK); // Pass time until slave is ready 
+                        @(vmif.m_drv_cb); // Pass time until slave is ready 
                     end 
                     if(vmif.AWVALID && vmif.AWREADY) begin
-                        set_write_addr(axi_m); // sets interfacee
+                        set_write_addr(pkt); // sets interfacee
                     end
                 end
             end
@@ -141,7 +149,7 @@ class master_axi_pipeline_driver extends uvm_driver;
             else if(axi_m.Channel == DATA) begin 
                 // Write Channel
                 if(axi_m.command == WRITE) begin
-                    set_write_data(axi_m); // Send data
+                    set_write_data(pkt); // Send data
                 end
             end
         end
@@ -167,8 +175,13 @@ endclass //master_axi_pipeline_driver extends uvm_driver
 
 
 
+
+
+
+
+
   // TODO THINK IT WILL BE IN MONITOR 
-    // task recieve_read_data(master_transaction axi_m); // TODO come back need to think how to check read data somehow
+    // task recieve_read_data(master_seqit axi_m); // TODO come back need to think how to check read data somehow
     //     vmif.RREADY = 1; // set high at beginning
     //     int idx = 0; 
     //     repeat(axi_m.BURST_size) begin

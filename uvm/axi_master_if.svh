@@ -1,15 +1,20 @@
 `ifndef AXI_MASTER_VH
 `define AXI_MASTER_VH
 
+`include "master_params.svh"
 
-interface axi_master_if #( // MAY NOT NEED TO PARM
-    parameter NUM_ID = NUM_ID,
-    parameter NUM_USER = NUM_USER,
-    parameter DATA_LEN = DAT_LEN // May get rid of TODO 1/20/25
-)
-(input logic ACLK, ARESETn); // FLAG I do not think rst should be here but I will look into
+/*
+ TODO GO TO MONITOR AND DRIVER AND FIX THE LENGTH AND 
+ SIZE VARIBALE SINCE IT IS NOT A 1 to 1 conversion of B to D
+*/
 
+// --- UVM --- //
+`include "uvm_macros.svh"
+import uvm_pkg::*;
 
+interface axi_master_if (input logic ACLK); // FLAG I do not think rst should be here but I will look into
+
+logic nRST;
 /////////////// WRITE ADDR CHANNEL/////////////////
 // INPUTS
 logic AWREADY;
@@ -18,9 +23,9 @@ logic AWVALID;
 logic [31:0] AWADDR;
 logic [2:0] AWSIZE;
 logic [1:0] AWBURST;
-logic [3:0] AWCACHE
-logic [2:0] AWPROT
-logic [NUM_ID - 1:0] AWID;
+logic [3:0] AWCACHE;
+logic [2:0] AWPROT;
+logic [ID_WIDTH - 1:0] AWID;
 logic [7:0] AWLEN;
 logic AWLOCK;
 logic [3:0] AWQOS;
@@ -35,9 +40,9 @@ logic WREADY;
 // OUTPUTS
 logic WVALID;
 logic WLAST;
-logic [DATA_LEN- 1:0] WDATA ;
-logic [x:0] WSTRB; // Todo figure out len
-logic [NUM_ID - 1: 0] WUSER; // Todo look into size
+logic [DATA_WIDTH- 1:0] WDATA ;
+logic [STRB_WIDTH:0] WSTRB; // Todo figure out len
+logic [ID_WIDTH - 1: 0] WUSER; // Todo look into size
 
 // Signals needed for UVM TB
 // logic [DATA_LEN- 1:0] WCDATA []; // Write Check data
@@ -60,7 +65,7 @@ logic [2:0] ARSIZE;
 logic [1:0] ARBURST;
 logic [3:0] ARCACHE;
 logic [2:0] ARPROT;
-logic [NUM_ID - 1:0] ARID;
+logic [ID_WIDTH - 1:0] ARID;
 logic [7:0] ARLEN;
 logic ARLOCK;
 logic [3:0] ARQOS;
@@ -71,12 +76,31 @@ logic [NUM_USER- 1:0] ARUSER; // Todo look into size
 // INPUTS
 logic RVALID;
 logic RLAST;
-logic [DATA_LEN - 1:0] RDATA;
+logic [DATA_WIDTH - 1:0] RDATA;
 logic [1:0] RRESP;
-logic [NUM_ID - 1:0] RID;
-logic [NUM_ID - 1: 0] RUSER; // Todo look into size
+logic [ID_WIDTH - 1:0] RID;
+logic [ID_WIDTH - 1: 0] RUSER; // Todo look into size
 // OUTPUTS
 logic RREADY;
+
+
+// LOCAL SIGS which are inputs I CONTROL
+    logic [ID_WIDTH - 1:0] local_awid;
+	logic [31:0] local_awaddr;
+	logic [7:0] local_awlen;
+	logic [2:0] local_awsize;
+	logic [1:0] local_awburst;
+	logic local_awlock; 
+	logic [31:0] local_wdata;
+	logic [STRB_WIDTH:0] local_wstrb;
+	logic local_wlast;
+	logic local_awvalid_i;
+	logic [ID_WIDTH - 1:0] local_arid;
+	logic [31:0] local_araddr;
+	logic [7:0] local_arlen;
+	logic [2:0] local_arsize;
+	logic [1:0] local_arburst;
+	logic local_arlock;
 
 // TODO LOOK INTO CLOCKING BLOCK
 
@@ -85,16 +109,36 @@ a particular clock and helps to specify the timing requirements
 between the clock and the signals"
 */
 
+// //  driver clocking block
+// clocking m_drv_cb @(posedge ACLK);
+//     output AWVALID, AWADDR, AWSIZE, AWBURST, AWCACHE, AWPROT,
+//     AWID, AWLEN, AWLOCK, AWQOS, AWREGION, AWUSER,
+//     WVALID, WLAST, WDATA, WSTRB, WUSER, BREADY, 
+//     ARADDR, ARSIZE, ARBURST, ARCACHE, ARPROT, ARID, ARREADY, 
+//     ARLEN, ARLOCK, ARQOS, ARREGION, ARUSER, RREADY;
+
+//     input AWREADY, WREADY, BVALID, BRESP, BID, ARVALID, BUSER,
+//     RDATA, RRESP, RID, RUSER, RVALID;
+// endclocking
+
 //  driver clocking block
-clocking m_drv_cb @(posedge ACLK)
+clocking m_drv_cb @(posedge ACLK);
     output AWVALID, AWADDR, AWSIZE, AWBURST, AWCACHE, AWPROT,
     AWID, AWLEN, AWLOCK, AWQOS, AWREGION, AWUSER,
     WVALID, WLAST, WDATA, WSTRB, WUSER, BREADY, 
     ARADDR, ARSIZE, ARBURST, ARCACHE, ARPROT, ARID, ARREADY, 
     ARLEN, ARLOCK, ARQOS, ARREGION, ARUSER, RREADY;
 
+    // SLAVE inputs
     input AWREADY, WREADY, BVALID, BRESP, BID, ARVALID, BUSER,
-    RVALID, RDATA, RRESP, RID, RUSER, RVALID;
+    RDATA, RRESP, RID, RUSER, RVALID,
+
+    // INPUTS to master FROM CPU or some sort of 'BIG MASTER' controlled by DRV
+    local_awid,local_awaddr,local_awlen,local_awsize,local_awburst
+    local_awlock,local_wdata,local_wstrb,local_wlast,local_awvalid_i,
+    local_arid,local_araddr,local_arlen,local_arsize,local_arburst,
+    local_arlock;
+    
 endclocking
 
 // //  monitor clocking block
@@ -113,8 +157,9 @@ endclocking
 // modport MMON(m_mon_cb, input ARESETn);
 
 // TODO ADD ASSERTIONS WHEN I KNOW THE SPECIFICATIONS OF THE DUT
+// NOTE for now WDATA == '1
 property nrst_success;
-    (@(m_mon_cb) $fell(nRST) |=> (AWVALID == 0 && AWSIZE == 0 && AWBURST == 0 && AWCACHE == 0 &&
+    (@(m_drv_cb) $fell(nRST) |=> (AWVALID == 0 && AWSIZE == 0 && AWBURST == 0 && AWCACHE == 0 &&
     AWPROT == 0 && AWID == 0 && AWLEN == 0 && AWLOCK == 0 && AWQOS == 0 && AWREGION == 0 && AWUSER == 0 &&
     WVALID == 0 && WLAST == 0 && WDATA == '1 && WSTRB == 0 && WUSER == 0 &&
     ARADDR == 0 && ARSIZE == 0 && ARBURST == 0 && ARCACHE == 0 && ARPROT == 0 && ARID == 0 && ARLEN == 0 &&
@@ -122,12 +167,9 @@ property nrst_success;
 endproperty 
 
 // nRST correct
-assert property (nrst_success) begin
-    `uvm_info("sva", $sformatf("Test Case: nRST0 : PASSED"), UVM_LOW)
-end 
-else begin
-    `uvm_info("sva", $sformatf("Test Case: nRST0 : FAILED, @ Time : %0t"), UVM_HIGH, $timeformat(-9, 2, "ns", 20))
-end
+assert property (nrst_success) `uvm_info("sva", $sformatf("Test Case: nRST0 : PASSED"), UVM_LOW)
+else `uvm_info("sva", $sformatf("Test Case: nRST0 : FAILED, @ Time : %0t",$time), UVM_HIGH)
+
 
 
 

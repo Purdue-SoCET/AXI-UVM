@@ -1,57 +1,38 @@
-`ifndef MASTER_TRANSACTIONS
-`define MASTER_TRANSACTIONS
+`ifndef MASTER_SEQIT
+`define MASTER_SEQIT
 
 
-import uvm_pkg::*;
 `include "uvm_macros.svh"
+import uvm_pkg::*;
+
 `include "master_params.svh"
 
 
-class master_transaction #(parameter NUM_ID = NUM_ID, parameter NUM_USER = NUM_USER, parameter DAT_LEN = DAT_LEN) extends uvm_sequence_item; 
+class master_seqit #(parameter DATA_WIDTH = DATA_WIDTH) extends uvm_sequence_item; 
+    `uvm_object_utils(master_seqit)
 
     // For now I am asuming these are all inputs 
     rand TYPE_CHANNEL Channel; // channel (addr,write/read,resp)
     rand logic [31:0] address; // addr
     rand TYPE_TRANS command; // type of transaction(read or write)
-    rand logic [DAT_LEN - 1:0] data[]; // FLAG this field can be up to 1024 so I need to figure out how to test it maybe multiple diffrent tests
+    rand logic [DATA_WIDTH - 1:0] data[]; // FLAG this field can be up to 1024 so I need to figure out how to test it maybe multiple diffrent tests
     rand logic [3:0] BURST_length; // how many transfers per transaction
     rand bit nRST;
     rand bit ready;
     rand bit valid;
-    rand bit TYPE_BURST BURST_type;
+    rand TYPE_BURST BURST_type;
     rand bit [3:0] CACHE;
     rand bit LOCK;
     rand bit [2:0] BURST_size; // how many bites per transfer
     rand bit [2:0] prot; // normal vs privelaged protection and secure vs non secure 
 
-    // Outputs tbd
-    logic [DAT_LEN - 1:0] out_data[]; // data outputed
+    // Outputs todo
+    logic [DATA_WIDTH - 1:0] out_data[]; // data outputed
     logic [31:0] out_addr; // addr outputed
     TYPE_RESP out_resp; // response
 
 
-`uvm_object_utils_begin(master_transaction)
-    //inputs 
-    `uvm_field_int(Channel, UVM_NOCOMPARE)
-    `uvm_field_int(address, UVM_NOCOMPARE)
-    `uvm_field_int(command, UVM_NOCOMPARE)
-    `uvm_field_array_int(data, UVM_NOCOMPARE)
-    `uvm_field_int(BURST_length, UVM_NOCOMPARE)
-    `uvm_field_int(nRST, UVM_NOCOMPARE)
-    `uvm_field_int(ready, UVM_NOCOMPARE)
-    `uvm_field_int(valid, UVM_NOCOMPARE)
-    `uvm_field_int(BURST_type, UVM_NOCOMPARE)
-    `uvm_field_int(CACHE, UVM_NOCOMPARE)
-    `uvm_field_int(LOCK, UVM_NOCOMPARE)
-    `uvm_field_int(BURST_size, UVM_NOCOMPARE)
-    `uvm_field_int(prot, UVM_NOCOMPARE)
-    
-    // Outputs 
-    `uvm_field_array_int(out_data, UVM_DEFAULT)
-    `uvm_field_int(out_addr, UVM_DEFAULT)
-    `uvm_field_int(out_resp, UVM_DEFAULT)
 
-`uvm_object_utils_end
 
     // Trying to keep track of what type of tranaction have been sent 
     static bit addr_type_sent = 0;
@@ -59,8 +40,8 @@ class master_transaction #(parameter NUM_ID = NUM_ID, parameter NUM_USER = NUM_U
     static bit response_type_sent = 0;
 
       constraint type_sent {
-        Channel != WDONE // need this in monitor for now
-        Channel != RDONE // need this in monitor for now
+        !(Channel inside{WDONE,RDONE}); // going to need these in the monitor for now not here
+        
         /*
         Order in which data must be sent for each ID
         1.ADDR
@@ -68,29 +49,20 @@ class master_transaction #(parameter NUM_ID = NUM_ID, parameter NUM_USER = NUM_U
         3.RESPONSE    
         */
 
-        if(!addr_type_sent) begin
-            Channel == ADDRESS; 
-        end 
-
-        if(!data_type_sent & addr_type_sent ) begin
-            Channel == DATA;
-        end
-
-        if(addr_type_sent & data_type_sent) begin
-            Channel == RESPONSE;
-        end
+        if(addr_type_sent == 0) Channel == ADDRESS; 
+        if(data_type_sent == 0 && addr_type_sent == 1) Channel == DATA;
+        if(addr_type_sent == 1 && data_type_sent == 1) Channel == RESPONSE;
     }
+
     constraint ready_valid {
         if(ready == 1) valid != 1;
         else if(valid == 1) ready != 1;
 
-        if(Channel == ADDRESS || ((Channel == DATA) && command == WRITE)) begin
-            ready != 1;
-        end
+        if(Channel == ADDRESS || ((Channel == DATA) && command == WRITE)) ready != 1;
 
-        if(Channel == DATA && (command == READ)) begin
-            valid != 1;
-        end    
+
+        if(Channel == DATA && (command == READ)) valid != 1;    
+
     }
     
     constraint bursts {
@@ -115,7 +87,7 @@ class master_transaction #(parameter NUM_ID = NUM_ID, parameter NUM_USER = NUM_U
 
 
     
-    function new(string name = "master_transaction");
+    function new(string name = "master_seqit");
         super.new(name);
     endfunction: new
     
@@ -141,6 +113,7 @@ class master_transaction #(parameter NUM_ID = NUM_ID, parameter NUM_USER = NUM_U
       
 endclass
 
+`endif
 
 
 
@@ -165,12 +138,34 @@ endclass
 
 
 
+/*
+`uvm_object_utils_begin(master_seqit)
+    //inputs 
+    `uvm_field_int(Channel, UVM_NOCOMPARE)
+    `uvm_field_int(address, UVM_NOCOMPARE)
+    `uvm_field_int(command, UVM_NOCOMPARE)
+    `uvm_field_array_int(data, UVM_NOCOMPARE)
+    `uvm_field_int(BURST_length, UVM_NOCOMPARE)
+    `uvm_field_int(nRST, UVM_NOCOMPARE)
+    `uvm_field_int(ready, UVM_NOCOMPARE)
+    `uvm_field_int(valid, UVM_NOCOMPARE)
+    `uvm_field_int(BURST_type, UVM_NOCOMPARE)
+    `uvm_field_int(CACHE, UVM_NOCOMPARE)
+    `uvm_field_int(LOCK, UVM_NOCOMPARE)
+    `uvm_field_int(BURST_size, UVM_NOCOMPARE)
+    `uvm_field_int(prot, UVM_NOCOMPARE)
+    
+    // Outputs 
+    `uvm_field_array_int(out_data, UVM_DEFAULT)
+    `uvm_field_int(out_addr, UVM_DEFAULT)
+    `uvm_field_int(out_resp, UVM_DEFAULT)
+
+`uvm_object_utils_end
+*/
 
 
 
-
-
-// class master_transaction #(parameter NUM_ID = NUM_ID, parameter NUM_USER = NUM_USER, parameter DATA_LEN = DAT_LEN) extends uvm_sequence_item;
+// class master_seqit #(parameter NUM_ID = NUM_ID, parameter NUM_USER = NUM_USER, parameter DATA_LEN = DAT_LEN) extends uvm_sequence_item;
 //     // Group: Variables
 
 //     rand TYPE_TRANS trans_t;

@@ -1,28 +1,20 @@
 import uvm_pkg::*;
 `include "uvm_macros.svh"
-`include "master_transactions.svh"
+`include "master_seqits.svh"
 `include "master_params.svh"
 
 //////////////////////// SEQUENCER////////////////////////////////////////
-// Generic sequencer
-class master_sequencer extends uvm_sequencer #(master_transaction);
-    `uvm_component_utils(master_sequencer) // regstering with factory 
 
-    function new(input string name = "master_sequencer", uvm_component parent = null);
-        super.new(name,parent);
-    endfunction : new
-endclass 
-
-class master_sequence extends uvm_sequence #(master_transaction);
+class master_sequence extends uvm_sequence #(master_seqit);
     `uvm_object_utils(master_sequence);
     
     function new(string name = "master_sequence");
         super.new(name);
     endfunction: new
 
-    master_transaction axi_m; // the transaction
+    master_seqit axi_m; // the transaction
 
-    task AXI_MASTER_write(input master_transaction axi_m);
+    task AXI_MASTER_write(input master_seqit axi_m);
         assert(axi_m.randomize with {axi_m.m_valid = 1, set_write(axi_m)});
         axi_m.update_state(); // updates state
         else `uvm_fatal("re_trans sequence", "Not able to randomize");
@@ -30,7 +22,7 @@ class master_sequence extends uvm_sequence #(master_transaction);
         finish_item(axi_m);
     endtask
 
-    task AXI_MASTER_read(input master_transaction axi_m);
+    task AXI_MASTER_read(input master_seqit axi_m);
         assert(axi_m.randomize with {axi_m.m_ready = 1, set_read(axi_m)});
         axi_m.update_state(); // updates state
         else `uvm_fatal("re_trans sequence", "Not able to randomize");
@@ -39,13 +31,13 @@ class master_sequence extends uvm_sequence #(master_transaction);
     endtask
 
     task body;
-        axi_m = master_transaction#(NUM_ID,NUM_USER,DAT_LEN):: type_id::create("req_item"); // Building  
+        axi_m = master_seqit#(DATA_WIDTH):: type_id::create("req_item"); // Building  
         // TODO ADD ALL TESTS
     endtask 
 
 endclass
 /////////////////// BASE SEQUENCE/////////////////////////////
-class master_base_sequence extends uvm_sequence #(master_transaction);
+class master_base_sequence extends uvm_sequence #(master_seqit);
     `uvm_object_utils(master_base_sequence);
 
     function new(string name = "master_base_sequence");
@@ -69,8 +61,8 @@ class master_base_sequence extends uvm_sequence #(master_transaction);
         input logic BVALID;
         input logic [1:0] BRESP;
         begin
-            master_transaction rewr_trans;
-            rewr_trans = master_transaction::type_id::create(NUM_ID,NUM_USER,DATA_LEN)::type_id::create("rewr_trans"); // building with factory 
+            master_seqit rewr_trans;
+            rewr_trans = master_seqit::type_id::create(NUM_ID,NUM_USER,DATA_LEN)::type_id::create("rewr_trans"); // building with factory 
             start_item(re_trans);
             if(randomize) begin
                 if(!rewr_trans.randomize()) begin
@@ -136,8 +128,8 @@ class axi_write_sequence extends master_base_sequence
         input logic BVALID;
         input logic [1:0] BRESP;
         begin
-            master_transaction rewr_trans;
-            rewr_trans = master_transaction::type_id::create(NUM_ID,NUM_USER,DATA_LEN)::type_id::create("rewr_trans"); // building with factory 
+            master_seqit rewr_trans;
+            rewr_trans = master_seqit::type_id::create(NUM_ID,NUM_USER,DATA_LEN)::type_id::create("rewr_trans"); // building with factory 
             rewr_trans.trans_t = WRITE; // force set WRITE transaction
             start_item(re_trans);
             if(randomize) begin
@@ -204,8 +196,8 @@ class axi_read_sequence extends master_base_sequence
         input logic BVALID;
         input logic [1:0] BRESP;
         begin
-            master_transaction rewr_trans;
-            rewr_trans = master_transaction::type_id::create(NUM_ID,NUM_USER,DATA_LEN)::type_id::create("rewr_trans"); // building with factory 
+            master_seqit rewr_trans;
+            rewr_trans = master_seqit::type_id::create(NUM_ID,NUM_USER,DATA_LEN)::type_id::create("rewr_trans"); // building with factory 
             rewr_trans.trans_t = READ; // force set READ transaction
             start_item(re_trans);
             if(randomize) begin
