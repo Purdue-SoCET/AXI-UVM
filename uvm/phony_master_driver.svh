@@ -3,9 +3,10 @@ import uvm_pkg::*;
 
 `include "axi_master_if.svh" // interface added
 `include "master_seqit.svh"
+// `include "master_driver.svh"
 
 
-class phony_master_driver extends uvm_driver;
+class phony_master_driver extends master_axi_pipeline_driver;
     `uvm_component_utils(phony_master_driver)
     virtual axi_master_if vmif;
 
@@ -55,33 +56,33 @@ class phony_master_driver extends uvm_driver;
     
     task set_read_data_resp (master_seqit axi_m);
          // TODO may need to force some signals here
-        vmif.rid_i <= 0;
-        vmif.rdata_i <= axi_m.data[0];
-        vmif.rresp_i <= axi_m.resp;
-        vmif.rlast_i <= 1; 
-        vmif.rvalid_i <= 1;
-        vmif.ruser_i <= 0;
+        vmif.RID <= 0;
+        vmif.RDATA <= axi_m.data[0];
+        vmif.RRESP <= axi_m.resp;
+        vmif.RLAST <= 1; 
+        vmif.RVALID <= 1;
+        vmif.RUSER <= 0;
     endtask
 
     task set_write_reponse (master_seqit axi_m);
-        vmif.bid_i <= 0;
-        vmif.bresp_i <= axi_m.resp;
-        vmif.bvalid_i <= 1;
-        vmif.buser_i <= 0;
+        vmif.BID <= 0;
+        vmif.BRESP <= axi_m.resp;
+        vmif.BVALID <= 1;
+        vmif.BUSER <= 0;
     endtask
     
 
         task run_phase(uvm_phase phase);
             `uvm_info("DRIVER CLASS", "Run Phase", UVM_HIGH)
-    
-            @(vmif.m_drv_cb); // TODO may not need will see
             
             forever begin
                 
                 pkt = master_seqit#(DATA_WIDTH)::type_id::create("pkt");
 
                 seq_item_port.get_next_item(pkt);
-
+                
+                @(vmif.m_drv_cb); // TODO may not need will see
+                vmif.nRST = pkt.nRST;
                 // READ COMMAND
                 if(pkt.command == READ) begin
                     if(pkt.Channel == ADDRESS) begin

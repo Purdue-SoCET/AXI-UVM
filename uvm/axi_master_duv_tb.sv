@@ -23,14 +23,15 @@ module axi_master_duv_tb();
     .bresp_i(amif.BRESP),
     .bvalid_i(amif.BVALID),
     .buser_i(amif.BUSER),
+    .rid_i(amif.RID),
     .rdata_i(amif.RDATA),
     .rresp_i(amif.RRESP),
     .rlast_i(amif.RLAST),
     .rvalid_i(amif.RVALID),
     .ruser_i(amif.RUSER),
-    .csysreq_i(0),
-    .csysack_i(0),
-    .cactive_i(0),
+    .csysreq_i(1'd0),
+    .csysack_i(1'd0),
+    .cactive_i(1'd0),
     .awid_i(amif.AWID),
     .awaddr_i(amif.AWADDR),
     .awlen_i(amif.AWLEN),
@@ -41,7 +42,7 @@ module axi_master_duv_tb();
     .awprot_i(amif.AWPROT),
     .awvalid_i(amif.AWVALID),
     .awready_i(amif.AWREADY),
-    .awqos_i(amif.ARQOS),
+    .awqos_i(amif.AWQOS),
     .awregion_i(amif.AWREGION),
     .awuser_i(amif.AWUSER),
     .wdata_i(amif.WDATA),
@@ -85,7 +86,7 @@ module axi_master_duv_tb();
     
   initial begin
     // sending interface down
-    uvm_config_db#(virtual axi_master_if)::set(null,"*", "vmif",amif);
+    uvm_config_db#(virtual axi_master_if)::set(null,"*", "axi_master_if",amif);
 
     // starting test 
     run_test("axi_master_test");

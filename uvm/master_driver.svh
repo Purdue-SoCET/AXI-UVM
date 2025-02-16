@@ -53,7 +53,7 @@ class master_axi_pipeline_driver extends uvm_driver #(master_seqit);
         vmif.ARSIZE <= axi_m.BURST_size;
         vmif.ARBURST <= axi_m.BURST_type;
         vmif.ARCACHE <= axi_m.CACHE;
-        vmif.ARPROT <= axi_m.PROT;
+        vmif.ARPROT <= axi_m.prot;
         vmif.ARID <= 0; // TODO NEED TO NOT MAKE THIS 0
         vmif.ARLEN <= axi_m.BURST_length;
         vmif.ARLOCK <= axi_m.LOCK;
@@ -86,7 +86,7 @@ class master_axi_pipeline_driver extends uvm_driver #(master_seqit);
         vmif.WLAST <= 0;
         
 
-        for (int idx = 0; idx < axi_m.BURST_length; idx++) begin
+        for (int idx = 0; idx < axi_m.BURST_length + 1; idx++) begin
 
             @(vmif.m_drv_cb);
             vmif.WVALID = 1; // set high at beginning
@@ -96,7 +96,7 @@ class master_axi_pipeline_driver extends uvm_driver #(master_seqit);
 
             // NOTE can randomize when Valid goes high if need be 
             if(vmif.WREADY && vmif.WVALID) begin
-                if(idx == axi_m.BURST_size - 1) begin
+                if(idx == axi_m.BURST_size) begin
                     vmif.WLAST = 1;
                 end
                 vmif.WDATA[idx] = axi_m.data[idx];
@@ -116,45 +116,48 @@ class master_axi_pipeline_driver extends uvm_driver #(master_seqit);
             `uvm_info("DRIVER CLASS", "Run Phase", UVM_HIGH)
             
             forever begin
-            pkt = master_seqit#(DATA_WIDTH)::type_id::create("pkt");
+                pkt = master_seqit#(DATA_WIDTH)::type_id::create("pkt");
 
-            seq_item_port.get_next_item(pkt);
+                seq_item_port.get_next_item(pkt);
 
-            // ADDRESS CHANNEL Being Driven
-            if(pkt.Channel == ADDRESS) begin
-                // READ Address Channel
-                if(pkt.command == READ) begin
-                    vmif.ARVALID <= 1'b1;
-                    while(!vmif.ARREADY) begin
-                        @(vmif.m_drv_cb); // Pass time until slave is ready 
-                    end 
-                    if(vmif.ARVALID && vmif.ARREADY) begin
-                        set_read_addr(pkt); // sets interfacee
+                // ADDRESS CHANNEL Being Driven
+                if(pkt.Channel == ADDRESS) begin
+                    // READ Address Channel
+                    if(pkt.command == READ) begin
+                        vmif.ARVALID <= 1'b1;
+                        while(!vmif.ARREADY) begin
+                            @(vmif.m_drv_cb); // Pass time until slave is ready 
+                        end 
+                        if(vmif.ARVALID && vmif.ARREADY) begin
+                            set_read_addr(pkt); // sets interfacee
+                            seq_item_port.item_done(); // item finishes 
+                        end
+                    end
+
+                    // Write Address Channel
+                    else if(pkt.command == WRITE) begin
+                        vmif.AWVALID <= 1'b1;
+                        while(!vmif.AWREADY) begin
+                            @(vmif.m_drv_cb); // Pass time until slave is ready 
+                        end 
+                        if(vmif.AWVALID && vmif.AWREADY) begin
+                            set_write_addr(pkt); // sets interfacee
+                            seq_item_port.item_done(); // item finishes 
+                        end
                     end
                 end
-
-                // Write Address Channel
-                else if(pkt.command == WRITE) begin
-                    vmif.AWVALID <= 1'b1;
-                    while(!vmif.AWREADY) begin
-                        @(vmif.m_drv_cb); // Pass time until slave is ready 
-                    end 
-                    if(vmif.AWVALID && vmif.AWREADY) begin
-                        set_write_addr(pkt); // sets interfacee
+                
+                // DATA CHANNEL Being Driven
+                else if(pkt.Channel == DATA) begin 
+                    // Write Channel
+                    if(pkt.command == WRITE) begin
+                        set_write_data(pkt); // Send data
+                        seq_item_port.item_done(); // item finishes 
                     end
                 end
             end
-            
-            // DATA CHANNEL Being Driven
-            else if(pkt.Channel == DATA) begin 
-                // Write Channel
-                if(pkt.command == WRITE) begin
-                    set_write_data(pkt); // Send data
-                end
-            end
-        end
 
-        seq_item_port.item_done(); // item finishes 
+            seq_item_port.item_done(); // item finishes 
     endtask
 
 endclass //master_axi_pipeline_driver extends uvm_driver

@@ -3,9 +3,10 @@ import uvm_pkg::*;
 `include "axi_master_if.svh" // interface added
 `include "master_seqit.svh"
 `include "master_params.svh"
+// `include "master_monitor.svh"
 
-class master_monitor extends uvm_monitor;
-    `uvm_component_utils(master_monitor)
+class phony_master_monitor extends master_monitor;
+    `uvm_component_utils(phony_master_monitor)
 
     virtual axi_master_if vmif;
 
@@ -14,17 +15,12 @@ class master_monitor extends uvm_monitor;
 
     uvm_analysis_port#(master_seqit) result_ap; // Result from DUT to COMP
 
-    function new(string name = "master_monitor", uvm_component parent = null);
+    function new(string name = "phony_master_monitor", uvm_component parent = null);
         super.new(name,parent);
-        result_ap = new("result_ap",this);
     endfunction //new()
 
     virtual function void build_phase(uvm_phase phase);
         super.build_phase(phase); 
-        // get interface from upper level
-        if(!uvm_config_db#(virtual axi_master_if)::get(this,"","axi_master_if",vmif)) begin
-            `uvm_fatal("Monitor", "No virtual interface specified for the monitor instance")
-        end
     endfunction
 
     virtual task run_phase(uvm_phase phase);
@@ -37,7 +33,23 @@ class master_monitor extends uvm_monitor;
             
             item.nRST = vmif.nRST;
             
+
             @(vmif.m_drv_cb);
+
+            // Inital values
+            item.address <= '1;
+            item.command <= WRITE;
+            item.data[0] <= '1; // no data on the read addr channel TODO CHANGE WRONG
+            item.BURST_length <= '1;
+            item.ready <= '1;
+            item.valid <= '1;
+            item.BURST_type <= TYPE_BURST'('1);
+            item.CACHE <= '1;
+            item.LOCK <= '1;
+            item.BURST_size <= '1;
+            item.prot <= '1;
+            item.out_data[0] <= '1; // no data its an addr channel TODO CHANGE WRONG
+            item.out_addr <='1; // addr is an output 
 
             // READ ADDR
             if(vmif.ARVALID && vmif.ARREADY) begin              
@@ -114,39 +126,6 @@ class master_monitor extends uvm_monitor;
                 item.prot <= vmif.AWPROT; // not sure
             end
 
-
-            if(item.command == READ && item.Channel == DATA) begin
-                int idx = 1;
-                repeat(vmif.ARLEN + 1) begin // TODO back I think this is incorrect
-                    while(!vmif.RVALID && !vmif.RREADY) begin
-                        @(vmif.m_drv_cb); // wait till valid go high
-                    end
-
-                    item.out_data[idx] <= vmif.RDATA;
-
-                    if(idx == vmif.ARLEN - 1) begin
-                        item.Channel <= RDONE; // needed so I do not get stuck in if construct
-                        break; // kill the loop 
-                    end
-                end
-            end
-
-            if(item.command == WRITE && item.Channel == DATA) begin
-                int idx = 1;
-                repeat(vmif.AWLEN + 1) begin // TODO COME BACK MAYBE WRONG 
-                    while(!vmif.WVALID && !vmif.WREADY) begin
-                        @(vmif.m_drv_cb); // wait till valid go high
-                    end
-
-                    item.out_data[idx] = vmif.WDATA;
-
-                    if(idx == vmif.AWBURST - 1) begin
-                        item.Channel <= WDONE; // needed so I do not get stuck in if construct
-                        break; // kill the loop 
-                    end
-                end
-            end
-
             result_ap.write(item); // write to SB
         end
         
@@ -154,84 +133,3 @@ class master_monitor extends uvm_monitor;
 
    
 endclass //master_monitor
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// OLD CODE MAY NEED LATER 
-/*
- task void write_monitor();
-        if(vif.m_mon_cb.AWVALID && vif.m_mon_cb.AWREADY) begin // READY from slave
-            wr_trans = master_seqit#(NUM_ID,NUM_USER,DATA_LEN)::type_id::create("wr_trans"); // Making write transaction
-            wr_trans.AWREADY = vif.m_mon_cb.AWREADY;
-            wr_trans.WREADY = vif.m_mon_cb.WREADY;
-            wr_trans.BVALID = vif.m_mon_cb.BVALID;
-            wr_trans.BRESP = vif.m_mon_cb.BRESP;
-            wr_trans.ARVALID = vif.m_mon_cb.ARVALID;
-            wr_trans.RVALID = vif.m_mon_cb.RVALID;
-            wr_trans.RLAST = vif.m_mon_cb.RLAST;
-            wr_trans.RDATA = vif.m_mon_cb.RDATA; // TODO need to extend to be array of data for multiple data transfer
-            wr_trans.RRESP = vif.m_mon_cb.RRESP;
-            wr_trans.RID = vif.m_mon_cb.RID;
-            wr_trans.RUSER = vif.m_mon_cb.RUSER;
-        end
-    endtask
-
-    task void write_monitor(master_seqit t);
-        if(vif.m_mon_cb.AWVALID && vif.m_mon_cb.AWREADY) begin // READY from slave
-            wr_trans = master_seqit#(NUM_ID,NUM_USER,DATA_LEN)::type_id::create("wr_trans"); // Making write transaction
-            wr_trans.AWREADY = vif.m_mon_cb.AWREADY;
-            wr_trans.WREADY = vif.m_mon_cb.WREADY;
-            wr_trans.BVALID = vif.m_mon_cb.BVALID;
-            wr_trans.BRESP = vif.m_mon_cb.BRESP;
-        end
-    endtask
-
-    task void read_monitor(master_seqit t);
-        if(vif.m_mon_cb.ARVALID && vif.m_mon_cb.ARREADY) begin // READY from master
-            re_trans = master_seqit#(NUM_ID,NUM_USER,DATA_LEN)::type_id::create("re_trans"); // Making write transaction
-            re_trans.ARVALID = vif.m_mon_cb.ARVALID;
-            re_trans.RVALID = vif.m_mon_cb.RVALID;
-            re_trans.RLAST = vif.m_mon_cb.RLAST;
-            re_trans.RDATA = vif.m_mon_cb.RDATA; // TODO need to extend to be array of data for multiple data transfer
-            re_trans.RRESP = vif.m_mon_cb.RRESP;
-            re_trans.RID = vif.m_mon_cb.RID;
-            re_trans.RUSER = vif.m_mon_cb.RUSER;
-        end
-    endtask
-
-
-
-    virtual task run_phase(phase);
-        super.run_phase(phase);
-        prev_tx = master_seqit#(NUM_ID,NUM_USER,DATA_LEN)::type_id::create("prev_tx"); // building with factory 
-        
-        // Monitor runs forever
-        master_seqit tx;
-        forever begin
-            fork
-                write_monitor(tx);
-                read_monitor(tx);
-            join
-        end
-        // PICK UP HERE
-        
-    endtask //
-*/
