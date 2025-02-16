@@ -19,8 +19,8 @@ class master_enviroment extends uvm_env;
 
     function void build_phase(uvm_phase phase);
         super.build_phase(phase);
-        m_agt = master_agent::type_id::create("m_agt");
-        m_sb = master_scoreboard::type_id::create("m_sb");
+        m_agt = master_agent::type_id::create("m_agt",this);
+        m_sb = master_scoreboard::type_id::create("m_sb",this);
     endfunction
 
     function void connect_phase(uvm_phase phase);

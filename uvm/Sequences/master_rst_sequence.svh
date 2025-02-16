@@ -37,7 +37,7 @@ endclass: rst_sequence
 //  Class: garbage_sequence
 
 class garbage_sequence extends uvm_sequence;
-    `uvm_object_utils(rst_sequence)
+    `uvm_object_utils(garbage_sequence)
   
     master_seqit garbage_seqit;
 

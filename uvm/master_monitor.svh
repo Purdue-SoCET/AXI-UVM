@@ -2,6 +2,7 @@ import uvm_pkg::*;
 `include "uvm_macros.svh"
 `include "axi_master_if.svh" // interface added
 `include "master_seqit.svh"
+`include "master_params.svh"
 
 class master_monitor extends uvm_monitor;
     `uvm_component_utils(master_monitor)
@@ -14,7 +15,7 @@ class master_monitor extends uvm_monitor;
     uvm_analysis_port#(master_seqit) result_ap; // Result from DUT to COMP
     master_seqit item; // Previous transaction
 
-    function new(string name, uvm_component parent = null);
+    function new(string name = "master_monitor", uvm_component parent = null);
         super.new(name,parent);
         result_ap = new("result_ap",this);
     endfunction //new()
@@ -42,20 +43,20 @@ class master_monitor extends uvm_monitor;
                 // inputs (TECHNICALLY OUTS ALSO NEED TO LOOK INTO)
                 item.address <= vmif.ARADDR;
                 item.command <= READ;
-                item.data <= '0; // no data on the read addr channel
+                item.data[0] <= '0; // no data on the read addr channel TODO CHANGE WRONG
                 item.BURST_length <= vmif.ARLEN;
                 item.ready <= vmif.ARREADY;
                 item.valid <= vmif.ARVALID;
-                item.BURST_type <= vmif.ARBURST;
+                item.BURST_type <= TYPE_BURST'(vmif.ARBURST);
                 item.CACHE <= vmif.ARCACHE;
                 item.LOCK <= vmif.ARLOCK;
                 item.BURST_size <= vmif.ARSIZE;
                 item.prot <= vmif.ARPROT;
 
                 // outputs 
-                item.out_data <= '0; // no data its an addr channel
+                item.out_data[0] <= '0; // no data its an addr channel TODO CHANGE WRONG
                 item.out_addr <= vmif.ARADDR; // addr is an output 
-                item.out_resp <= OKAY; // not used here
+                // item.out_resp <= OKAY; // not used here
             end
 
             // if write addr
@@ -63,20 +64,20 @@ class master_monitor extends uvm_monitor;
                 // inputs (TECHNICALLY OUTS ALSO NEED TO LOOK INTO)
                 item.address <= vmif.AWADDR;
                 item.command <= WRITE;
-                item.data <= '0; // no data on the write addr channel
+                item.data[0] <= '0; // no data on the write addr channel TODO CHANGE WRONG
                 item.BURST_length <= vmif.AWLEN;
                 item.ready <= vmif.AWREADY;
                 item.valid <= vmif.AWVALID;
-                item.BURST_type <= vmif.AWBURST;
+                item.BURST_type <= TYPE_BURST'(vmif.AWBURST);
                 item.CACHE <= vmif.AWCACHE;
                 item.LOCK <= vmif.AWLOCK;
                 item.BURST_size <= vmif.AWSIZE;
                 item.prot <= vmif.AWPROT;
 
                 // outputs 
-                item.out_data <= '0; // no data its an addr channel
+                item.out_data[0] <= '0; // no data its an addr channel TODO CHANGE WRONF
                 item.out_addr <= vmif.AWADDR; // addr is an output 
-                item.out_resp <= OKAY; // not used here
+                // item.out_resp <= OKAY; // not used here
             end
 
             // READ DATA
@@ -84,12 +85,12 @@ class master_monitor extends uvm_monitor;
                 item.address <= 0; // not relevant
                 item.command <= READ;
                 item.Channel <= DATA;
-                item.data <= 0; // irrelevant
+                item.data[0] <= 0; // irrelevant todo change wrong
                 item.out_data[0] <= vmif.RDATA;
                 item.BURST_length <= vmif.ARLEN; // TODO tricky logic gere not simple come back to this 
                 item.ready <= vmif.RREADY;
                 item.valid <= vmif.RVALID;
-                item.BURST_type <= vmif.ARBURST; // not sure what to do with this field
+                item.BURST_type <= TYPE_BURST'(vmif.ARBURST); // not sure what to do with this field
                 item.CACHE <= vmif.ARCACHE; // not sure
                 item.LOCK <= vmif.ARLOCK; // not sure
                 item.BURST_size <= vmif.ARSIZE; // not sure
@@ -98,14 +99,14 @@ class master_monitor extends uvm_monitor;
 
             if(item.command == READ && item.Channel == DATA) begin
                 int idx = 1;
-                repeat(vmif.BURST_length) begin
+                repeat(vmif.ARLEN) begin // TODO back I think this is incorrect
                     while(!vmif.RVALID && !vmif.RREADY) begin
                         @(vmif.m_drv_cb); // wait till valid go high
                     end
 
                     item.out_data[idx] <= vmif.RDATA;
 
-                    if(idx == vmif.BURST_length - 1) begin
+                    if(idx == vmif.ARLEN - 1) begin
                         item.Channel <= RDONE; // needed so I do not get stuck in if construct
                         break; // kill the loop 
                     end
@@ -122,7 +123,7 @@ class master_monitor extends uvm_monitor;
                 item.BURST_length <= vmif.AWLEN; // TODO tricky logic gere not simple come back to this 
                 item.ready <= vmif.WREADY;
                 item.valid <= vmif.WVALID;
-                item.BURST_type <= vmif.AWBURST; // not sure what to do with this field
+                item.BURST_type <= TYPE_BURST'(vmif.AWBURST); // not sure what to do with this field
                 item.CACHE <= vmif.AWCACHE; // not sure
                 item.LOCK <= vmif.AWLOCK; // not sure
                 item.BURST_size <= vmif.AWSIZE; // not sure
@@ -131,14 +132,14 @@ class master_monitor extends uvm_monitor;
 
             if(item.command == WRITE && item.Channel == DATA) begin
                 int idx = 1;
-                repeat(vmif.BURST_length) begin
+                repeat(vmif.AWBURST) begin // COME BACK MAYBE WRONG
                     while(!vmif.WVALID && !vmif.WREADY) begin
                         @(vmif.m_drv_cb); // wait till valid go high
                     end
 
                     item.out_data[idx] = vmif.WDATA;
 
-                    if(idx == vmif.BURST_length - 1) begin
+                    if(idx == vmif.AWBURST - 1) begin
                         item.Channel <= WDONE; // needed so I do not get stuck in if construct
                         break; // kill the loop 
                     end

@@ -13,7 +13,7 @@ class master_agent extends uvm_agent;
     master_axi_pipeline_driver m_drv;
     master_sequencer m_sqr;
 
-    function new(string name, uvm_component parent = null);
+    function new(string name = "master_agent", uvm_component parent = null);
         super.new(name,parent);
     endfunction //new()
 

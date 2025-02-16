@@ -30,13 +30,13 @@ import uvm_pkg::*;
    transactions to complete
 */
 
-class master_axi_pipeline_driver extends uvm_driver;
+class master_axi_pipeline_driver extends uvm_driver #(master_seqit);
     `uvm_component_utils(master_axi_pipeline_driver)
     virtual axi_master_if vmif;
 
     master_seqit pkt;
 
-    function new(string name, uvm_component parent = null);
+    function new(string name = "master_axi_pipeline_driver", uvm_component parent = null);
         super.new(name,parent);
     endfunction //new()
 
@@ -114,7 +114,7 @@ class master_axi_pipeline_driver extends uvm_driver;
 
         task run_phase(uvm_phase phase);
             `uvm_info("DRIVER CLASS", "Run Phase", UVM_HIGH)
-    
+            
             forever begin
             pkt = master_seqit#(DATA_WIDTH)::type_id::create("pkt");
 
@@ -146,9 +146,9 @@ class master_axi_pipeline_driver extends uvm_driver;
             end
             
             // DATA CHANNEL Being Driven
-            else if(axi_m.Channel == DATA) begin 
+            else if(pkt.Channel == DATA) begin 
                 // Write Channel
-                if(axi_m.command == WRITE) begin
+                if(pkt.command == WRITE) begin
                     set_write_data(pkt); // Send data
                 end
             end

@@ -25,11 +25,12 @@ class master_seqit #(parameter DATA_WIDTH = DATA_WIDTH) extends uvm_sequence_ite
     rand bit LOCK;
     rand bit [2:0] BURST_size; // how many bites per transfer
     rand bit [2:0] prot; // normal vs privelaged protection and secure vs non secure 
+    rand TYPE_RESP resp; // response
 
     // Outputs todo
     logic [DATA_WIDTH - 1:0] out_data[]; // data outputed
     logic [31:0] out_addr; // addr outputed
-    TYPE_RESP out_resp; // response
+    // TYPE_RESP out_resp; // MOVED RESPONSE TO INPUT SIDE
 
 
 
@@ -38,6 +39,10 @@ class master_seqit #(parameter DATA_WIDTH = DATA_WIDTH) extends uvm_sequence_ite
     static bit addr_type_sent = 0;
     static bit data_type_sent = 0;
     static bit response_type_sent = 0;
+
+        // TODO Change this constraint later
+        constraint response_sent {resp == OKAY;}
+
 
       constraint type_sent {
         !(Channel inside{WDONE,RDONE}); // going to need these in the monitor for now not here

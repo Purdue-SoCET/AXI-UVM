@@ -12,7 +12,7 @@ class master_scoreboard extends uvm_scoreboard;
     `uvm_component_utils(master_scoreboard)
 
     uvm_analysis_imp #(master_seqit, master_scoreboard) scoreboard_port;
-    master_seqit tranactions[$]; // dynamic array may need for later
+    master_seqit transactions[$]; // dynamic array may need for later
 
 
     function new(string name = "master_scoreboard", uvm_component parent);
@@ -36,8 +36,8 @@ class master_scoreboard extends uvm_scoreboard;
            // --- Transaction Stack --- //
     forever begin
         master_seqit curr_tx;
-        wait((tranactions.size() != 0));
-        curr_tx = tranactions.pop_front();
+        wait((transactions.size() != 0));
+        curr_tx = transactions.pop_front();
         compare(curr_tx);
     end
 
@@ -53,7 +53,7 @@ class master_scoreboard extends uvm_scoreboard;
                 if (curr_tx.address == '0) uvm_report_info("COMPARE", $sformatf("Test Case: RESET0 : PASSED"), UVM_LOW);
                 else uvm_report_info("COMPARE", $sformatf("Test Case: RESET0 : FAILED"), UVM_HIGH);
 
-                if (curr_tx.data == '0) uvm_report_info("COMPARE", $sformatf("Test Case: RESET0 : PASSED"), UVM_LOW);
+                if (curr_tx.data[0] == '1) uvm_report_info("COMPARE", $sformatf("Test Case: RESET0 : PASSED"), UVM_LOW);
                 else uvm_report_info("COMPARE", $sformatf("Test Case: RESET0 : FAILED"), UVM_HIGH);
 
                 if (curr_tx.BURST_length == '0) uvm_report_info("COMPARE", $sformatf("Test Case: RESET0 : PASSED"), UVM_LOW);
@@ -83,7 +83,7 @@ class master_scoreboard extends uvm_scoreboard;
                 if (curr_tx.prot == '0) uvm_report_info("COMPARE", $sformatf("Test Case: RESET0 : PASSED"), UVM_LOW);
                 else uvm_report_info("COMPARE", $sformatf("Test Case: RESET0 : FAILED"), UVM_HIGH);
 
-                if (curr_tx.out_data == '0) uvm_report_info("COMPARE", $sformatf("Test Case: RESET0 : PASSED"), UVM_LOW);
+                if (curr_tx.out_data[0] == '1) uvm_report_info("COMPARE", $sformatf("Test Case: RESET0 : PASSED"), UVM_LOW);
                 else uvm_report_info("COMPARE", $sformatf("Test Case: RESET0 : FAILED"), UVM_HIGH);
 
                 if (curr_tx.out_addr == '0) uvm_report_info("COMPARE", $sformatf("Test Case: RESET0 : PASSED"), UVM_LOW);

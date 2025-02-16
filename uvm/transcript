@@ -1,0 +1,126 @@
+# //  Questa Sim
+# //  Version 10.7a linux Mar 26 2018
+# //
+# //  Copyright 1991-2018 Mentor Graphics Corporation
+# //  All Rights Reserved.
+# //
+# //  QuestaSim and its associated documentation contain trade
+# //  secrets and commercial or financial information that are the property of
+# //  Mentor Graphics Corporation and are privileged, confidential,
+# //  and exempt from disclosure under the Freedom of Information Act,
+# //  5 U.S.C. Section 552. Furthermore, this information
+# //  is prohibited from disclosure under the Trade Secrets Act,
+# //  18 U.S.C. Section 1905.
+# //
+# vsim -coverage -i axi_master_duv_tb -L /package/eda/mg/questa10.6b/questasim/uvm-1.2 -voptargs="+acc" "+UVM_TESTNAME=master_test" "+UVM_VERBOSITY=UVM_MEDIUM" -do "do wave.do" -do "run -all" 
+# Start time: 20:21:29 on Feb 15,2025
+# Loading /tmp/omer0@asicfab.ecn.purdue.edu_dpi_40493/linux_gcc-5.3.0/export_tramp.so
+# ** Note: (vsim-3813) Design is being optimized due to module recompilation...
+# ** Warning: axi_master_duv_tb.sv(19): (vopt-2685) [TFMPC] - Too few port connections for 'AXIMDUT'.  Expected 65, found 64.
+# ** Warning: axi_master_duv_tb.sv(19): (vopt-2718) [TFMPC] - Missing connection for port 'rid_i'.
+# ** Warning: Sequences/master_rst_sequence.svh(29): (vopt-2239) Treating stand-alone use of presumed external function as an implicit VOID cast.
+# ** Warning: Sequences/master_rst_sequence.svh(55): (vopt-2239) Treating stand-alone use of presumed external function as an implicit VOID cast.
+# Loading sv_std.std
+# Loading /package/eda/mg/questa10.6b/questasim/uvm-1.2.uvm_pkg
+# Loading work.axi_master_duv_tb_sv_unit(fast)
+# Loading work.axi_master_duv_tb(fast)
+# Loading work.axi_master_if(fast)
+# Loading work.axi_duv_master(fast)
+# Loading /package/eda/mg/questa10.6b/questasim/uvm-1.2.questa_uvm_pkg(fast)
+# Loading work.axi_master_if(fast)
+# ** Warning: (vsim-3015) [PCDPC] - Port size (32) does not match connection size (1) for port 'awuser_i'. The port definition is at: axi_duv_master_modify.sv(37).
+#    Time: 0 ps  Iteration: 0  Instance: /axi_master_duv_tb/AXIMDUT File: axi_master_duv_tb.sv Line: 19
+# ** Warning: (vsim-3015) [PCDPC] - Port size (4) does not match connection size (5) for port 'wstrb_i'. The port definition is at: axi_duv_master_modify.sv(39).
+#    Time: 0 ps  Iteration: 0  Instance: /axi_master_duv_tb/AXIMDUT File: axi_master_duv_tb.sv Line: 19
+# ** Warning: (vsim-3015) [PCDPC] - Port size (32) does not match connection size (4) for port 'wuser_i'. The port definition is at: axi_duv_master_modify.sv(43).
+#    Time: 0 ps  Iteration: 0  Instance: /axi_master_duv_tb/AXIMDUT File: axi_master_duv_tb.sv Line: 19
+# ** Warning: (vsim-3015) [PCDPC] - Port size (4) does not match connection size (1) for port 'bid_i'. The port definition is at: axi_duv_master_modify.sv(44).
+#    Time: 0 ps  Iteration: 0  Instance: /axi_master_duv_tb/AXIMDUT File: axi_master_duv_tb.sv Line: 19
+# ** Warning: (vsim-3015) [PCDPC] - Port size (2) does not match connection size (1) for port 'bresp_i'. The port definition is at: axi_duv_master_modify.sv(45).
+#    Time: 0 ps  Iteration: 0  Instance: /axi_master_duv_tb/AXIMDUT File: axi_master_duv_tb.sv Line: 19
+# ** Warning: (vsim-3015) [PCDPC] - Port size (32) does not match connection size (1) for port 'buser_i'. The port definition is at: axi_duv_master_modify.sv(48).
+#    Time: 0 ps  Iteration: 0  Instance: /axi_master_duv_tb/AXIMDUT File: axi_master_duv_tb.sv Line: 19
+# ** Warning: (vsim-3839) Variable '/axi_master_duv_tb/amif/ARQOS', driven via a port connection, is multiply driven. See axi_master_duv_tb.sv(19).
+#    Time: 0 ps  Iteration: 0  Instance: /axi_master_duv_tb/AXIMDUT File: axi_master_duv_tb.sv Line: 19
+# ** Warning: (vsim-3015) [PCDPC] - Port size (32) does not match connection size (1) for port 'aruser_i'. The port definition is at: axi_duv_master_modify.sv(61).
+#    Time: 0 ps  Iteration: 0  Instance: /axi_master_duv_tb/AXIMDUT File: axi_master_duv_tb.sv Line: 19
+# ** Warning: (vsim-3015) [PCDPC] - Port size (32) does not match connection size (4) for port 'ruser_i'. The port definition is at: axi_duv_master_modify.sv(68).
+#    Time: 0 ps  Iteration: 0  Instance: /axi_master_duv_tb/AXIMDUT File: axi_master_duv_tb.sv Line: 19
+# ** Warning: (vsim-3015) [PCDPC] - Port size (1) does not match connection size (32) for port 'csysreq_i'. The port definition is at: axi_duv_master_modify.sv(69).
+#    Time: 0 ps  Iteration: 0  Instance: /axi_master_duv_tb/AXIMDUT File: axi_master_duv_tb.sv Line: 19
+# ** Warning: (vsim-3015) [PCDPC] - Port size (1) does not match connection size (32) for port 'csysack_i'. The port definition is at: axi_duv_master_modify.sv(70).
+#    Time: 0 ps  Iteration: 0  Instance: /axi_master_duv_tb/AXIMDUT File: axi_master_duv_tb.sv Line: 19
+# ** Warning: (vsim-3015) [PCDPC] - Port size (1) does not match connection size (32) for port 'cactive_i'. The port definition is at: axi_duv_master_modify.sv(71).
+#    Time: 0 ps  Iteration: 0  Instance: /axi_master_duv_tb/AXIMDUT File: axi_master_duv_tb.sv Line: 19
+# ** Warning: (vsim-3015) [PCDPC] - Port size (4) does not match connection size (5) for port 'local_wstrb'. The port definition is at: axi_duv_master_modify.sv(79).
+#    Time: 0 ps  Iteration: 0  Instance: /axi_master_duv_tb/AXIMDUT File: axi_master_duv_tb.sv Line: 19
+# ** Warning: (vsim-3839) Variable '/axi_master_duv_tb/amif/AWVALID', driven via a port connection, is multiply driven. See axi_master_duv_tb.sv(19).
+#    Time: 0 ps  Iteration: 0  Instance: /axi_master_duv_tb/amif File: axi_master_if.svh Line: 22
+# ** Warning: (vsim-3839) Variable '/axi_master_duv_tb/amif/AWADDR', driven via a port connection, is multiply driven. See axi_master_duv_tb.sv(19).
+#    Time: 0 ps  Iteration: 0  Instance: /axi_master_duv_tb/amif File: axi_master_if.svh Line: 23
+# ** Warning: (vsim-3839) Variable '/axi_master_duv_tb/amif/AWSIZE', driven via a port connection, is multiply driven. See axi_master_duv_tb.sv(19).
+#    Time: 0 ps  Iteration: 0  Instance: /axi_master_duv_tb/amif File: axi_master_if.svh Line: 24
+# ** Warning: (vsim-3839) Variable '/axi_master_duv_tb/amif/AWBURST', driven via a port connection, is multiply driven. See axi_master_duv_tb.sv(19).
+#    Time: 0 ps  Iteration: 0  Instance: /axi_master_duv_tb/amif File: axi_master_if.svh Line: 25
+# ** Warning: (vsim-3839) Variable '/axi_master_duv_tb/amif/AWCACHE', driven via a port connection, is multiply driven. See axi_master_duv_tb.sv(19).
+#    Time: 0 ps  Iteration: 0  Instance: /axi_master_duv_tb/amif File: axi_master_if.svh Line: 26
+# ** Warning: (vsim-3839) Variable '/axi_master_duv_tb/amif/AWPROT', driven via a port connection, is multiply driven. See axi_master_duv_tb.sv(19).
+#    Time: 0 ps  Iteration: 0  Instance: /axi_master_duv_tb/amif File: axi_master_if.svh Line: 27
+# ** Warning: (vsim-3839) Variable '/axi_master_duv_tb/amif/AWID', driven via a port connection, is multiply driven. See axi_master_duv_tb.sv(19).
+#    Time: 0 ps  Iteration: 0  Instance: /axi_master_duv_tb/amif File: axi_master_if.svh Line: 28
+# ** Warning: (vsim-3839) Variable '/axi_master_duv_tb/amif/AWLEN', driven via a port connection, is multiply driven. See axi_master_duv_tb.sv(19).
+#    Time: 0 ps  Iteration: 0  Instance: /axi_master_duv_tb/amif File: axi_master_if.svh Line: 29
+# ** Warning: (vsim-3839) Variable '/axi_master_duv_tb/amif/AWLOCK', driven via a port connection, is multiply driven. See axi_master_duv_tb.sv(19).
+#    Time: 0 ps  Iteration: 0  Instance: /axi_master_duv_tb/amif File: axi_master_if.svh Line: 30
+# ** Warning: (vsim-3839) Variable '/axi_master_duv_tb/amif/AWREGION', driven via a port connection, is multiply driven. See axi_master_duv_tb.sv(19).
+#    Time: 0 ps  Iteration: 0  Instance: /axi_master_duv_tb/amif File: axi_master_if.svh Line: 32
+# ** Warning: (vsim-3839) Variable '/axi_master_duv_tb/amif/AWUSER', driven via a port connection, is multiply driven. See axi_master_duv_tb.sv(19).
+#    Time: 0 ps  Iteration: 0  Instance: /axi_master_duv_tb/amif File: axi_master_if.svh Line: 33
+# ** Warning: (vsim-3839) Variable '/axi_master_duv_tb/amif/WVALID', driven via a port connection, is multiply driven. See axi_master_duv_tb.sv(19).
+#    Time: 0 ps  Iteration: 0  Instance: /axi_master_duv_tb/amif File: axi_master_if.svh Line: 41
+# ** Warning: (vsim-3839) Variable '/axi_master_duv_tb/amif/WLAST', driven via a port connection, is multiply driven. See axi_master_duv_tb.sv(19).
+#    Time: 0 ps  Iteration: 0  Instance: /axi_master_duv_tb/amif File: axi_master_if.svh Line: 42
+# ** Warning: (vsim-3839) Variable '/axi_master_duv_tb/amif/WDATA', driven via a port connection, is multiply driven. See axi_master_duv_tb.sv(19).
+#    Time: 0 ps  Iteration: 0  Instance: /axi_master_duv_tb/amif File: axi_master_if.svh Line: 43
+# ** Warning: (vsim-3839) Variable '/axi_master_duv_tb/amif/WSTRB', driven via a port connection, is multiply driven. See axi_master_duv_tb.sv(19).
+#    Time: 0 ps  Iteration: 0  Instance: /axi_master_duv_tb/amif File: axi_master_if.svh Line: 44
+# ** Warning: (vsim-3839) Variable '/axi_master_duv_tb/amif/WUSER', driven via a port connection, is multiply driven. See axi_master_duv_tb.sv(19).
+#    Time: 0 ps  Iteration: 0  Instance: /axi_master_duv_tb/amif File: axi_master_if.svh Line: 45
+# ** Warning: (vsim-3839) Variable '/axi_master_duv_tb/amif/BREADY', driven via a port connection, is multiply driven. See axi_master_duv_tb.sv(19).
+#    Time: 0 ps  Iteration: 0  Instance: /axi_master_duv_tb/amif File: axi_master_if.svh Line: 55
+# ** Warning: (vsim-3839) Variable '/axi_master_duv_tb/amif/ARADDR', driven via a port connection, is multiply driven. See axi_master_duv_tb.sv(19).
+#    Time: 0 ps  Iteration: 0  Instance: /axi_master_duv_tb/amif File: axi_master_if.svh Line: 63
+# ** Warning: (vsim-3839) Variable '/axi_master_duv_tb/amif/ARSIZE', driven via a port connection, is multiply driven. See axi_master_duv_tb.sv(19).
+#    Time: 0 ps  Iteration: 0  Instance: /axi_master_duv_tb/amif File: axi_master_if.svh Line: 64
+# ** Warning: (vsim-3839) Variable '/axi_master_duv_tb/amif/ARBURST', driven via a port connection, is multiply driven. See axi_master_duv_tb.sv(19).
+#    Time: 0 ps  Iteration: 0  Instance: /axi_master_duv_tb/amif File: axi_master_if.svh Line: 65
+# ** Warning: (vsim-3839) Variable '/axi_master_duv_tb/amif/ARCACHE', driven via a port connection, is multiply driven. See axi_master_duv_tb.sv(19).
+#    Time: 0 ps  Iteration: 0  Instance: /axi_master_duv_tb/amif File: axi_master_if.svh Line: 66
+# ** Warning: (vsim-3839) Variable '/axi_master_duv_tb/amif/ARPROT', driven via a port connection, is multiply driven. See axi_master_duv_tb.sv(19).
+#    Time: 0 ps  Iteration: 0  Instance: /axi_master_duv_tb/amif File: axi_master_if.svh Line: 67
+# ** Warning: (vsim-3839) Variable '/axi_master_duv_tb/amif/ARID', driven via a port connection, is multiply driven. See axi_master_duv_tb.sv(19).
+#    Time: 0 ps  Iteration: 0  Instance: /axi_master_duv_tb/amif File: axi_master_if.svh Line: 68
+# ** Warning: (vsim-3839) Variable '/axi_master_duv_tb/amif/ARREADY', driven via a port connection, is multiply driven. See axi_master_duv_tb.sv(19).
+#    Time: 0 ps  Iteration: 0  Instance: /axi_master_duv_tb/amif File: axi_master_if.svh Line: 62
+# ** Warning: (vsim-3839) Variable '/axi_master_duv_tb/amif/ARLEN', driven via a port connection, is multiply driven. See axi_master_duv_tb.sv(19).
+#    Time: 0 ps  Iteration: 0  Instance: /axi_master_duv_tb/amif File: axi_master_if.svh Line: 69
+# ** Warning: (vsim-3839) Variable '/axi_master_duv_tb/amif/ARLOCK', driven via a port connection, is multiply driven. See axi_master_duv_tb.sv(19).
+#    Time: 0 ps  Iteration: 0  Instance: /axi_master_duv_tb/amif File: axi_master_if.svh Line: 70
+# ** Warning: (vsim-3839) Variable '/axi_master_duv_tb/amif/ARQOS', driven via a port connection, is multiply driven. See axi_master_duv_tb.sv(19).
+#    Time: 0 ps  Iteration: 0  Instance: /axi_master_duv_tb/amif File: axi_master_if.svh Line: 71
+# ** Warning: (vsim-3839) Variable '/axi_master_duv_tb/amif/ARREGION', driven via a port connection, is multiply driven. See axi_master_duv_tb.sv(19).
+#    Time: 0 ps  Iteration: 0  Instance: /axi_master_duv_tb/amif File: axi_master_if.svh Line: 72
+# ** Warning: (vsim-3839) Variable '/axi_master_duv_tb/amif/ARUSER', driven via a port connection, is multiply driven. See axi_master_duv_tb.sv(19).
+#    Time: 0 ps  Iteration: 0  Instance: /axi_master_duv_tb/amif File: axi_master_if.svh Line: 73
+# ** Warning: (vsim-3839) Variable '/axi_master_duv_tb/amif/RREADY', driven via a port connection, is multiply driven. See axi_master_duv_tb.sv(19).
+#    Time: 0 ps  Iteration: 0  Instance: /axi_master_duv_tb/amif File: axi_master_if.svh Line: 84
+# ** Error: (vsim-3043) Unresolved reference to 'PROT'.
+#    Time: 0 ps  Iteration: 0  Region: /axi_master_duv_tb_sv_unit::master_axi_pipeline_driver File: master_driver.svh Line: 56
+# ** Fatal: (vsim-8274) Virtual interface elem. 'rid_i' not found in 'axi_master_if'.
+#    Time: 0 ps  Iteration: 0  Region: /axi_master_duv_tb_sv_unit::phony_master_driver File: phony_master_driver.svh Line: 58
+# FATAL ERROR while loading design
+# Error loading design
+# End time: 20:21:32 on Feb 15,2025, Elapsed time: 0:00:03
+# Errors: 3, Warnings: 47
+# 
+# stdin: <EOF>

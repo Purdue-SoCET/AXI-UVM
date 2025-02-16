@@ -134,7 +134,7 @@ clocking m_drv_cb @(posedge ACLK);
     RDATA, RRESP, RID, RUSER, RVALID,
 
     // INPUTS to master FROM CPU or some sort of 'BIG MASTER' controlled by DRV
-    local_awid,local_awaddr,local_awlen,local_awsize,local_awburst
+    local_awid,local_awaddr,local_awlen,local_awsize,local_awburst,
     local_awlock,local_wdata,local_wstrb,local_wlast,local_awvalid_i,
     local_arid,local_araddr,local_arlen,local_arsize,local_arburst,
     local_arlock;
