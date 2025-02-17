@@ -23,6 +23,25 @@ class phony_master_monitor extends master_monitor;
         super.build_phase(phase); 
     endfunction
 
+    function intial_vals(master_seqit item);
+        
+        item.address <= '1;
+        item.command <= WRITE;
+        item.data[0] <= '0; // no data on the read addr channel TODO CHANGE WRONG
+        item.BURST_length <= '1;
+        item.ready <= '1;
+        item.valid <= '1;
+        item.BURST_type <= TYPE_BURST'('1);
+        item.CACHE <= '1;
+        item.LOCK <= '1;
+        item.BURST_size <='1;
+        item.prot <= '1;
+
+        // outputs 
+        item.out_data[0] <= '0; // no data its an addr channel TODO CHANGE WRONG
+        item.out_addr <= '1; // addr is an output 
+
+    endfunction
     virtual task run_phase(uvm_phase phase);
         super.run_phase(phase);
 
@@ -31,26 +50,12 @@ class phony_master_monitor extends master_monitor;
             master_seqit item; // Previous transaction
             item = master_seqit#(DATA_WIDTH)::type_id::create("item");
             
+            intial_vals(item);
+
             item.nRST = vmif.nRST;
-            
+            // int
 
             @(vmif.m_drv_cb);
-
-            // Inital values
-            item.address <= '1;
-            item.command <= WRITE;
-            item.data[0] <= '1; // no data on the read addr channel TODO CHANGE WRONG
-            item.BURST_length <= '1;
-            item.ready <= '1;
-            item.valid <= '1;
-            item.BURST_type <= TYPE_BURST'('1);
-            item.CACHE <= '1;
-            item.LOCK <= '1;
-            item.BURST_size <= '1;
-            item.prot <= '1;
-            item.out_data[0] <= '1; // no data its an addr channel TODO CHANGE WRONG
-            item.out_addr <='1; // addr is an output 
-
             // READ ADDR
             if(vmif.ARVALID && vmif.ARREADY) begin              
                 // inputs (TECHNICALLY OUTS ALSO NEED TO LOOK INTO)
@@ -133,3 +138,21 @@ class phony_master_monitor extends master_monitor;
 
    
 endclass //master_monitor
+
+
+
+
+//    // Inital values
+// item.address <= '1;
+// item.command <= WRITE;
+// item.data[0] <= '1; // no data on the read addr channel TODO CHANGE WRONG
+// item.BURST_length <= '1;
+// item.ready <= '1;
+// item.valid <= '1;
+// item.BURST_type <= TYPE_BURST'('1);
+// item.CACHE <= '1;
+// item.LOCK <= '1;
+// item.BURST_size <= '1;
+// item.prot <= '1;
+// item.out_data[0] <= '1; // no data its an addr channel TODO CHANGE WRONG
+// item.out_addr <='1; // addr is an output 

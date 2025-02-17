@@ -55,6 +55,7 @@ class garbage_sequence extends uvm_sequence;
         `uvm_info("GARBAGE_SEQ", "Inside body task", UVM_HIGH)
 
         // --- Randomize With Reset --- //
+        // TODO Channel DATA NOT BEING DRIVEN CORRECT LOOK INTO
         garbage_seqit = master_seqit#(DATA_WIDTH)::type_id::create("garbage_seqit");
         start_item(garbage_seqit);
         garbage_seqit.randomize() with {

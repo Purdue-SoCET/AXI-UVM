@@ -47,16 +47,32 @@ class master_test extends uvm_test;
     endfunction
 
     task run_phase(uvm_phase phase);
+
+
         phase.raise_objection(this, "Starting sequences");
 
+        // if (!uvm_hdl_force("axi_master_duv_tb.axi_duv_master.awready_i", 1'b1))
+		// 	`uvm_error ("TEST", $sformatf ("axi_master_duv_tb.axi_duv_master.awready_i"))
+       
+        // if (!uvm_hdl_force("axi_master_duv_tb.axi_duv_master.arready_i", 1'b1))
+		// 	`uvm_error ("TEST", $sformatf ("axi_master_duv_tb.axi_duv_master.arready_i"))
+       
+        // if (!uvm_hdl_force("axi_master_duv_tb.axi_duv_master.wready_i", 1'b1))
+		// 	`uvm_error ("TEST", $sformatf ("axi_master_duv_tb.axi_duv_master.wready_i"))
        
         // TC 1 Reset
         
-        garb_seq.start(m_env.m_agt.m_sqr); // send garbage sequence
-        // rst_seq.start(m_env.m_agt.m_sqr); // send reset sequence
-       
-        // TC 2
+        // garb_seq.start(m_env.m_agt.m_sqr); // send garbage sequence
+        rst_seq.start(m_env.m_agt.m_sqr); // send reset sequence
+        repeat(100) begin
+            repeat(8) begin
+                garb_seq.start(m_env.m_agt.m_sqr); // send garbage sequence
+            end
+            rst_seq.start(m_env.m_agt.m_sqr); // send reset sequence
+        end
+        #(100ns);
 
+        // TC 2
         phase.drop_objection(this, "Finished sequences");
 
     endtask

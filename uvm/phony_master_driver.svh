@@ -32,6 +32,12 @@ class phony_master_driver extends master_axi_pipeline_driver;
         vmif.local_arburst <= axi_m.BURST_type;
         vmif.local_arid <= 0;
         vmif.local_arlen <= axi_m.BURST_length;
+        vmif.ARREADY <= 1; // setting slave to be ready 
+        
+        // wait then set ready to low
+        @(vmif.m_drv_cb); // progress time
+        @(vmif.m_drv_cb); // progress time
+        vmif.ARREADY <= 0; // setting slave to be ready;
     endtask
 
     // PICK UP HERE
@@ -43,12 +49,13 @@ class phony_master_driver extends master_axi_pipeline_driver;
         vmif.local_awburst <= axi_m.BURST_type;
         vmif.local_awid <= 0;
         vmif.local_awlen <= axi_m.BURST_length;
+        vmif.AWREADY <= 1; // setting slave to be ready;
     endtask
 
 
     task set_write_data(master_seqit axi_m); 
          // TODO may need to force some signals here
-        vmif.local_wlast <= 0;
+        vmif.local_wlast <= 1;
         vmif.local_wstrb <= 0;
         vmif.local_wdata <= axi_m.data[0];
     endtask
@@ -62,6 +69,9 @@ class phony_master_driver extends master_axi_pipeline_driver;
         vmif.RLAST <= 1; 
         vmif.RVALID <= 1;
         vmif.RUSER <= 0;
+        @(vmif.m_drv_cb); // progress time
+        vmif.RLAST <= 0; 
+        vmif.RVALID <= 0;
     endtask
 
     task set_write_reponse (master_seqit axi_m);
@@ -69,8 +79,44 @@ class phony_master_driver extends master_axi_pipeline_driver;
         vmif.BRESP <= axi_m.resp;
         vmif.BVALID <= 1;
         vmif.BUSER <= 0;
+
+        @(vmif.m_drv_cb); // progress time
+        vmif.BVALID <= 0;
     endtask
     
+
+    task intial_inputs(master_seqit axi_m);
+        vmif.AWREADY <= '0;
+        vmif.WREADY <= '0;
+        vmif.BVALID <= 0;
+        vmif.BRESP <= '0;
+        vmif.BID <= '1;
+        vmif.BUSER <= '1;
+        vmif.ARREADY <= 1;  
+        vmif.RDATA <= '1;//
+        vmif.RRESP <= '1;//
+        vmif.RID <= '1;//
+        vmif.RUSER <= '1;//
+        vmif.RVALID <= 0;//
+        vmif.RLAST <= 0; //
+        vmif.local_awid <= '1;
+        vmif.local_awaddr <= '1;
+        vmif.local_awlen <= '1;
+        vmif.local_awsize <= '1;
+        vmif.local_awburst <= '1;
+        vmif.local_awlock <= '1;
+        vmif.local_wdata <= '1;
+        vmif.local_wstrb <= '1;
+        vmif.local_wlast <= '1;
+        vmif.local_awvalid_i <= 0;
+        vmif.local_arid <= '1;
+        vmif.local_araddr <= '1;
+        vmif.local_arlen <= '1;
+        vmif.local_arsize <= '1;
+        vmif.local_arburst <= '1;
+        vmif.local_arlock <= '1;
+        vmif.nRST <= '1;
+    endtask
 
         task run_phase(uvm_phase phase);
             `uvm_info("DRIVER CLASS", "Run Phase", UVM_HIGH)
@@ -81,12 +127,16 @@ class phony_master_driver extends master_axi_pipeline_driver;
 
                 seq_item_port.get_next_item(pkt);
                 
+
                 @(vmif.m_drv_cb); // TODO may not need will see
+                intial_inputs(pkt); // intialize inputs
                 vmif.nRST = pkt.nRST;
+
+            
                 // READ COMMAND
                 if(pkt.command == READ) begin
                     if(pkt.Channel == ADDRESS) begin
-                        set_read_addr(pkt);
+                        set_read_addr(pkt); 
                     end
                     else if (pkt.Channel == DATA || pkt.Channel == RESPONSE) begin
                         set_read_data_resp(pkt);
@@ -105,10 +155,9 @@ class phony_master_driver extends master_axi_pipeline_driver;
                     else if (pkt.Channel == RESPONSE) begin
                         set_write_reponse(pkt);
                     end
-                end
+                end 
+                seq_item_port.item_done(); // item finishes 
             end
-
-        seq_item_port.item_done(); // item finishes 
     endtask
 
 endclass //master_axi_pipeline_driver extends uvm_driver
@@ -147,3 +196,35 @@ endclass //master_axi_pipeline_driver extends uvm_driver
     //         end
     //     end
     // endtask
+
+
+// // DEFAULT VALUES 
+                // vmif.AWREADY = '1;
+                // vmif.WREADY = '1;
+                // vmif.BVALID = '1;
+                // vmif.BRESP = '1;
+                // vmif.BID = '1;
+                // vmif.ARVALID = '1;
+                // vmif.BUSER = '1;
+                // vmif.RDATA = '1;
+                // vmif.RRESP = '1;
+                // vmif.RID = '1;
+                // vmif.RUSER = '1;
+                // vmif.RVALID = '1;
+                // vmif.local_awid = '1;
+                // vmif.local_awaddr = '1;
+                // vmif.local_awlen = '1;
+                // vmif.local_awsize = '1;
+                // vmif.local_awburst = '1;
+                // vmif.local_awlock = '1;
+                // vmif.local_wdata = '1;
+                // vmif.local_wstrb = '1;
+                // vmif.local_wlast = '1;
+                // vmif.local_awvalid_i = '1;
+                // vmif.local_arid = '1;
+                // vmif.local_araddr = '1;
+                // vmif.local_arlen = '1;
+                // vmif.local_arsize = '1;
+                // vmif.local_arburst = '1;
+                // vmif.local_arlock = '1;
+        

@@ -109,17 +109,6 @@ a particular clock and helps to specify the timing requirements
 between the clock and the signals"
 */
 
-// //  driver clocking block
-// clocking m_drv_cb @(posedge ACLK);
-//     output AWVALID, AWADDR, AWSIZE, AWBURST, AWCACHE, AWPROT,
-//     AWID, AWLEN, AWLOCK, AWQOS, AWREGION, AWUSER,
-//     WVALID, WLAST, WDATA, WSTRB, WUSER, BREADY, 
-//     ARADDR, ARSIZE, ARBURST, ARCACHE, ARPROT, ARID, ARREADY, 
-//     ARLEN, ARLOCK, ARQOS, ARREGION, ARUSER, RREADY;
-
-//     input AWREADY, WREADY, BVALID, BRESP, BID, ARVALID, BUSER,
-//     RDATA, RRESP, RID, RUSER, RVALID;
-// endclocking
 
 //  driver clocking block
 clocking m_drv_cb @(posedge ACLK);
@@ -127,7 +116,7 @@ clocking m_drv_cb @(posedge ACLK);
     AWID, AWLEN, AWLOCK, AWQOS, AWREGION, AWUSER,
     WVALID, WLAST, WDATA, WSTRB, WUSER, BREADY, 
     ARADDR, ARSIZE, ARBURST, ARCACHE, ARPROT, ARID, ARREADY, 
-    ARLEN, ARLOCK, ARQOS, ARREGION, ARUSER, RREADY;
+    ARLEN, ARLOCK, ARQOS, ARREGION, ARUSER, RREADY, nRST;
 
     // SLAVE inputs
     input AWREADY, WREADY, BVALID, BRESP, BID, ARVALID, BUSER,
@@ -140,6 +129,45 @@ clocking m_drv_cb @(posedge ACLK);
     local_arlock;
     
 endclocking
+
+
+
+// TODO ADD ASSERTIONS WHEN I KNOW THE SPECIFICATIONS OF THE DUT
+// NOTE for now WDATA == '1
+property nrst_success;
+    (@(m_drv_cb) $fell(nRST) |=> (AWVALID == 0 && AWSIZE == 0 && AWBURST == 0 && AWCACHE == 0 &&
+    AWPROT == 0 && AWID == 0 && AWLEN == 0 && AWLOCK == 0 && AWQOS == 0 && AWREGION == 0 && AWUSER == 0 &&
+    WVALID == 0 && WLAST == 0 && WDATA == '1 && WSTRB == 0 && WUSER == 0 &&
+    ARADDR == 0 && ARSIZE == 0 && ARBURST == 0 && ARCACHE == 0 && ARPROT == 0 && ARID == 0 && ARLEN == 0 &&
+    ARLOCK == 0 && ARQOS == 0 && ARREGION == 0 && ARUSER == 0 && RREADY == 0));
+endproperty 
+
+
+endinterface
+`endif // end of 
+
+
+
+// //  driver clocking block
+// clocking m_drv_cb @(posedge ACLK);
+//     output AWVALID, AWADDR, AWSIZE, AWBURST, AWCACHE, AWPROT,
+//     AWID, AWLEN, AWLOCK, AWQOS, AWREGION, AWUSER,
+//     WVALID, WLAST, WDATA, WSTRB, WUSER, BREADY, 
+//     ARADDR, ARSIZE, ARBURST, ARCACHE, ARPROT, ARID, ARREADY, 
+//     ARLEN, ARLOCK, ARQOS, ARREGION, ARUSER, RREADY;
+
+//     input AWREADY, WREADY, BVALID, BRESP, BID, ARVALID, BUSER,
+//     RDATA, RRESP, RID, RUSER, RVALID;
+// endclocking
+
+
+
+
+//TODO come back and fix this 
+// // nRST correct
+// assert property (nrst_success) `uvm_info("sva", $sformatf("Test Case: nRST0 : PASSED"), UVM_LOW)
+// else `uvm_info("sva", $sformatf("Test Case: nRST0 : FAILED, @ Time : %0t",$time), UVM_HIGH)
+
 
 // //  monitor clocking block
 // clocking m_mon_cb @(posedge ACLK) // This makes sense inputs into the monitor are outputs of DUT
@@ -156,20 +184,6 @@ endclocking
 // modport MDRV(m_drv_cb, input ARESETn);
 // modport MMON(m_mon_cb, input ARESETn);
 
-// TODO ADD ASSERTIONS WHEN I KNOW THE SPECIFICATIONS OF THE DUT
-// NOTE for now WDATA == '1
-property nrst_success;
-    (@(m_drv_cb) $fell(nRST) |=> (AWVALID == 0 && AWSIZE == 0 && AWBURST == 0 && AWCACHE == 0 &&
-    AWPROT == 0 && AWID == 0 && AWLEN == 0 && AWLOCK == 0 && AWQOS == 0 && AWREGION == 0 && AWUSER == 0 &&
-    WVALID == 0 && WLAST == 0 && WDATA == '1 && WSTRB == 0 && WUSER == 0 &&
-    ARADDR == 0 && ARSIZE == 0 && ARBURST == 0 && ARCACHE == 0 && ARPROT == 0 && ARID == 0 && ARLEN == 0 &&
-    ARLOCK == 0 && ARQOS == 0 && ARREGION == 0 && ARUSER == 0 && RREADY == 0));
-endproperty 
-
-//TODO come back and fix this 
-// // nRST correct
-// assert property (nrst_success) `uvm_info("sva", $sformatf("Test Case: nRST0 : PASSED"), UVM_LOW)
-// else `uvm_info("sva", $sformatf("Test Case: nRST0 : FAILED, @ Time : %0t",$time), UVM_HIGH)
 
 
 
@@ -201,6 +215,3 @@ endproperty
 //     input RVALID,RDATA,RDATA,RRESP,RID,RUSER,
 //     output RREADY
 // );
-
-endinterface
-`endif // end of 
