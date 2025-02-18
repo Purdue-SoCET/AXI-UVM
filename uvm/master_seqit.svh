@@ -28,7 +28,7 @@ class master_seqit #(parameter DATA_WIDTH = DATA_WIDTH) extends uvm_sequence_ite
     rand TYPE_RESP resp; // response
 
     // Outputs todo
-    logic [DATA_WIDTH - 1:0] out_data[]; // data outputed
+    logic [DATA_WIDTH - 1:0] out_data; // data outputed
     logic [31:0] out_addr; // addr outputed
     // TYPE_RESP out_resp; // MOVED RESPONSE TO INPUT SIDE
 
@@ -50,7 +50,7 @@ class master_seqit #(parameter DATA_WIDTH = DATA_WIDTH) extends uvm_sequence_ite
     `uvm_field_int(prot, UVM_ALL_ON)
     
     // Outputs 
-    `uvm_field_array_int(out_data, UVM_DEFAULT)
+    `uvm_field_int(out_data, UVM_DEFAULT)
     `uvm_field_int(out_addr, UVM_DEFAULT)
 `uvm_object_utils_end
 

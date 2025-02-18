@@ -44,7 +44,7 @@ class master_monitor extends uvm_monitor;
                 // inputs (TECHNICALLY OUTS ALSO NEED TO LOOK INTO)
                 item.address <= vmif.ARADDR;
                 item.command <= READ;
-                item.data[0] <= '0; // no data on the read addr channel TODO CHANGE WRONG
+                item.data <= '0; // no data on the read addr channel TODO CHANGE WRONG
                 item.BURST_length <= vmif.ARLEN;
                 item.ready <= vmif.ARREADY;
                 item.valid <= vmif.ARVALID;
@@ -55,7 +55,7 @@ class master_monitor extends uvm_monitor;
                 item.prot <= vmif.ARPROT;
 
                 // outputs 
-                item.out_data[0] <= '0; // no data its an addr channel TODO CHANGE WRONG
+                item.out_data <= '0; // no data its an addr channel TODO CHANGE WRONG
                 item.out_addr <= vmif.ARADDR; // addr is an output 
                 // item.out_resp <= OKAY; // not used here
             end
@@ -65,7 +65,7 @@ class master_monitor extends uvm_monitor;
                 // inputs (TECHNICALLY OUTS ALSO NEED TO LOOK INTO)
                 item.address <= vmif.AWADDR;
                 item.command <= WRITE;
-                item.data[0] <= '0; // no data on the write addr channel TODO CHANGE WRONG
+                item.data <= '0; // no data on the write addr channel TODO CHANGE WRONG
                 item.BURST_length <= vmif.AWLEN;
                 item.ready <= vmif.AWREADY;
                 item.valid <= vmif.AWVALID;
@@ -76,7 +76,7 @@ class master_monitor extends uvm_monitor;
                 item.prot <= vmif.AWPROT;
 
                 // outputs 
-                item.out_data[0] <= '0; // no data its an addr channel TODO CHANGE WRONF
+                item.out_data <= '0; // no data its an addr channel TODO CHANGE WRONF
                 item.out_addr <= vmif.AWADDR; // addr is an output 
                 // item.out_resp <= OKAY; // not used here
             end
@@ -86,8 +86,8 @@ class master_monitor extends uvm_monitor;
                 item.address <= 0; // not relevant
                 item.command <= READ;
                 item.Channel <= DATA;
-                item.data[0] <= 0; // irrelevant todo change wrong
-                item.out_data[0] <= vmif.RDATA;
+                item.data <= 0; // irrelevant todo change wrong
+                item.out_data <= vmif.RDATA;
                 item.BURST_length <= vmif.ARLEN; // TODO tricky logic gere not simple come back to this 
                 item.ready <= vmif.RREADY;
                 item.valid <= vmif.RVALID;
@@ -103,7 +103,7 @@ class master_monitor extends uvm_monitor;
                 item.address <= 0; // not relevant
                 item.command <= WRITE;
                 item.Channel <= DATA;
-                item.data[0] <= vmif.WDATA;
+                item.data <= vmif.WDATA;
                 item.BURST_length <= vmif.AWLEN; // TODO tricky logic gere not simple come back to this 
                 item.ready <= vmif.WREADY;
                 item.valid <= vmif.WVALID;
