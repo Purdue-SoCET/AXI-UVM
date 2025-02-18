@@ -63,15 +63,14 @@ class master_test extends uvm_test;
         
         // garb_seq.start(m_env.m_agt.m_sqr); // send garbage sequence
         // rst_seq.start(m_env.m_agt.m_sqr); // send reset sequence
-        // repeat(100) begin
-        // repeat(1) begin
-        // garb_seq.print(); // print values 
-        garb_seq.start(m_env.m_agt.m_sqr); // send garbage sequence
-        // end
-        // #(100ns);
-        // rst_seq.print(); // print values 
-        rst_seq.start(m_env.m_agt.m_sqr); // send reset sequence
-        // end
+        repeat(100) begin
+            repeat(8) begin
+                garb_seq.start(m_env.m_agt.m_sqr); // send garbage sequence
+            end
+            // #(100ns);
+            // rst_seq.print(); // print values 
+            rst_seq.start(m_env.m_agt.m_sqr); // send reset sequence
+        end
         #(100ns);
 
         // TC 2

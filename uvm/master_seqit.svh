@@ -15,7 +15,7 @@ class master_seqit #(parameter DATA_WIDTH = DATA_WIDTH) extends uvm_sequence_ite
     rand TYPE_CHANNEL Channel; // channel (addr,write/read,resp)
     rand logic [31:0] address; // addr
     rand TYPE_TRANS command; // type of transaction(read or write)
-    rand logic [DATA_WIDTH - 1:0] data[]; // FLAG this field can be up to 1024 so I need to figure out how to test it maybe multiple diffrent tests
+    rand logic [DATA_WIDTH - 1:0] data; // TODO FLAG this field can be up to 1024 so I need to figure out how to test it maybe multiple diffrent tests
     rand logic [3:0] BURST_length; // how many transfers per transaction
     rand bit nRST;
     rand bit ready;
@@ -38,7 +38,7 @@ class master_seqit #(parameter DATA_WIDTH = DATA_WIDTH) extends uvm_sequence_ite
     `uvm_field_enum(TYPE_CHANNEL,Channel, UVM_ALL_ON)
     `uvm_field_int(address, UVM_ALL_ON)
     `uvm_field_enum(TYPE_TRANS,command, UVM_ALL_ON)
-    `uvm_field_array_int(data, UVM_ALL_ON)
+    `uvm_field_int(data, UVM_ALL_ON)
     `uvm_field_int(BURST_length, UVM_ALL_ON)
     `uvm_field_int(nRST, UVM_ALL_ON)
     `uvm_field_int(ready, UVM_ALL_ON)
@@ -60,7 +60,7 @@ class master_seqit #(parameter DATA_WIDTH = DATA_WIDTH) extends uvm_sequence_ite
     static bit response_type_sent = 0;
 
         // TODO Change this constraint later
-        constraint response_sent {resp == OKAY;}
+        // constraint response_sent {resp == OKAY;}
 
 
     //   constraint type_sent {

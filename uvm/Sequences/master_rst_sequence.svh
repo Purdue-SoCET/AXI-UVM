@@ -28,11 +28,11 @@ class rst_sequence extends uvm_sequence;
         start_item(reset_seqit);
         reset_seqit.randomize() with {
             nRST == 0;
-            BURST_length == 0;
-            BURST_type == 0;
-            BURST_size == 0;
-            Channel == ADDRESS;
-            command == WRITE;
+            // BURST_length == 0;
+            // BURST_type == 0;
+            // BURST_size == 0;
+            // Channel == ADDRESS;
+            // command == WRITE;
         };
         // reset_seqit.update_state(); // updates state
         finish_item(reset_seqit);
@@ -62,11 +62,11 @@ class garbage_sequence extends uvm_sequence;
         start_item(garbage_seqit);
         garbage_seqit.randomize() with {
             nRST == 1;
-            BURST_length == 0;
-            BURST_type == 0;
-            BURST_size == 0;
-            Channel == ADDRESS;
-            command == WRITE;
+            // BURST_length == 0;
+            // BURST_type == 0;
+            // BURST_size == 0;
+            // Channel == ADDRESS;
+            // command == WRITE;
         };
         // garbage_seqit.update_state(); // updates state
         finish_item(garbage_seqit);
