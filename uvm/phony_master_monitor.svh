@@ -49,13 +49,11 @@ class phony_master_monitor extends master_monitor;
         forever begin
             master_seqit item; // Previous transaction
             item = master_seqit#(DATA_WIDTH)::type_id::create("item");
-            
-            intial_vals(item);
-
-            item.nRST = vmif.nRST;
-            // int
-
+            intial_vals(item); // intial values 
             @(vmif.m_drv_cb);
+            item.nRST = vmif.nRST;
+            @(vmif.m_drv_cb);
+         
             // READ ADDR
             if(vmif.ARVALID && vmif.ARREADY) begin              
                 // inputs (TECHNICALLY OUTS ALSO NEED TO LOOK INTO)

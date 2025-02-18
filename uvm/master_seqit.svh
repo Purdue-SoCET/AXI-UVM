@@ -9,7 +9,7 @@ import uvm_pkg::*;
 
 
 class master_seqit #(parameter DATA_WIDTH = DATA_WIDTH) extends uvm_sequence_item; 
-    `uvm_object_utils(master_seqit)
+    // `uvm_object_utils(master_seqit)
 
     // For now I am asuming these are all inputs 
     rand TYPE_CHANNEL Channel; // channel (addr,write/read,resp)
@@ -33,7 +33,26 @@ class master_seqit #(parameter DATA_WIDTH = DATA_WIDTH) extends uvm_sequence_ite
     // TYPE_RESP out_resp; // MOVED RESPONSE TO INPUT SIDE
 
 
-
+`uvm_object_utils_begin(master_seqit)
+    //inputs 
+    `uvm_field_enum(TYPE_CHANNEL,Channel, UVM_ALL_ON)
+    `uvm_field_int(address, UVM_ALL_ON)
+    `uvm_field_enum(TYPE_TRANS,command, UVM_ALL_ON)
+    `uvm_field_array_int(data, UVM_ALL_ON)
+    `uvm_field_int(BURST_length, UVM_ALL_ON)
+    `uvm_field_int(nRST, UVM_ALL_ON)
+    `uvm_field_int(ready, UVM_ALL_ON)
+    `uvm_field_int(valid, UVM_ALL_ON)
+    `uvm_field_enum(TYPE_BURST,BURST_type, UVM_ALL_ON)
+    `uvm_field_int(CACHE, UVM_ALL_ON)
+    `uvm_field_int(LOCK, UVM_ALL_ON)
+    `uvm_field_int(BURST_size, UVM_ALL_ON)
+    `uvm_field_int(prot, UVM_ALL_ON)
+    
+    // Outputs 
+    `uvm_field_array_int(out_data, UVM_DEFAULT)
+    `uvm_field_int(out_addr, UVM_DEFAULT)
+`uvm_object_utils_end
 
     // Trying to keep track of what type of tranaction have been sent 
     static bit addr_type_sent = 0;
@@ -44,20 +63,20 @@ class master_seqit #(parameter DATA_WIDTH = DATA_WIDTH) extends uvm_sequence_ite
         constraint response_sent {resp == OKAY;}
 
 
-      constraint type_sent {
-        !(Channel inside{WDONE,RDONE}); // going to need these in the monitor for now not here
+    //   constraint type_sent {
+    //     !(Channel inside{WDONE,RDONE}); // going to need these in the monitor for now not here
         
-        /*
-        Order in which data must be sent for each ID
-        1.ADDR
-        2.DATA
-        3.RESPONSE    
-        */
+    //     /*
+    //     Order in which data must be sent for each ID
+    //     1.ADDR
+    //     2.DATA
+    //     3.RESPONSE    
+    //     */
 
-        if(addr_type_sent == 0) Channel == ADDRESS; 
-        if(data_type_sent == 0 && addr_type_sent == 1) Channel == DATA;
-        if(addr_type_sent == 1 && data_type_sent == 1) Channel == RESPONSE;
-    }
+    //     if(addr_type_sent == 0) Channel == ADDRESS; 
+    //     if(data_type_sent == 0 && addr_type_sent == 1) Channel == DATA;
+    //     if(addr_type_sent == 1 && data_type_sent == 1) Channel == RESPONSE;
+    // }
 
     constraint ready_valid {
         if(ready == 1) valid != 1;

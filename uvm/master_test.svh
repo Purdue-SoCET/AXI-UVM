@@ -8,6 +8,8 @@ import uvm_pkg::*;
 `include "phony_master_monitor.svh"
 
 class master_test extends uvm_test;
+
+    parameter PERIOD = 100;
     `uvm_component_utils(master_test)
 
     master_enviroment m_env;
@@ -22,13 +24,10 @@ class master_test extends uvm_test;
     function void build_phase(uvm_phase phase);
         super.build_phase(phase);
 
-       
-
         m_env = master_enviroment::type_id::create("m_env",this);
-        garb_seq = garbage_sequence::type_id::create("garb_seq");    
-        rst_seq = rst_sequence::type_id::create("rst_seq");
-
-        
+        rst_seq = rst_sequence::type_id::create("rst_seq"); 
+        garb_seq = garbage_sequence::type_id::create("garb_seq");   
+    
          // overiding driver to phoney driver for rst case
         set_type_override_by_type(master_axi_pipeline_driver::get_type(),phony_master_driver::get_type());
 
@@ -63,13 +62,16 @@ class master_test extends uvm_test;
         // TC 1 Reset
         
         // garb_seq.start(m_env.m_agt.m_sqr); // send garbage sequence
+        // rst_seq.start(m_env.m_agt.m_sqr); // send reset sequence
+        // repeat(100) begin
+        // repeat(1) begin
+        // garb_seq.print(); // print values 
+        garb_seq.start(m_env.m_agt.m_sqr); // send garbage sequence
+        // end
+        // #(100ns);
+        // rst_seq.print(); // print values 
         rst_seq.start(m_env.m_agt.m_sqr); // send reset sequence
-        repeat(100) begin
-            repeat(8) begin
-                garb_seq.start(m_env.m_agt.m_sqr); // send garbage sequence
-            end
-            rst_seq.start(m_env.m_agt.m_sqr); // send reset sequence
-        end
+        // end
         #(100ns);
 
         // TC 2
