@@ -60,7 +60,7 @@ class phony_master_driver extends master_axi_pipeline_driver;
         // wait then set ready to low
         @(vmif.m_drv_cb); // progress time
         vmif.ARREADY <= 0; // setting slave to be ready;
-        @(vmif.m_drv_cb); // progress time
+        // @(vmif.m_drv_cb); // progress time
     endtask
 
     // PICK UP HERE
@@ -101,7 +101,7 @@ class phony_master_driver extends master_axi_pipeline_driver;
         @(vmif.m_drv_cb); // progress time
         vmif.AWREADY <= 0;
         vmif.local_awvalid_i <= 0; // TODO CHANGE BACK TO INTERNAL INPUT
-        @(vmif.m_drv_cb); // progress time
+        // @(vmif.m_drv_cb); // progress time
     endtask
 
 
@@ -139,7 +139,7 @@ class phony_master_driver extends master_axi_pipeline_driver;
         vmif.local_wdata <= axi_m.data;
         @(vmif.m_drv_cb); // progress time
         vmif.WREADY <= '0;
-        @(vmif.m_drv_cb); // progress time
+        // @(vmif.m_drv_cb); // progress time
     endtask
 
     
@@ -173,11 +173,11 @@ class phony_master_driver extends master_axi_pipeline_driver;
         vmif.RRESP <= axi_m.resp;
         vmif.RLAST <= 1; 
         vmif.RVALID <= 1;
-        vmif.RUSER <= 0;
+        vmif.RUSER <= axi_m.user;
         @(vmif.m_drv_cb); // progress time
         vmif.RLAST <= 0; 
         vmif.RVALID <= 0;
-        @(vmif.m_drv_cb); // progress time
+        // @(vmif.m_drv_cb); // progress time
     endtask
 
     task set_write_reponse (master_seqit axi_m);
@@ -211,11 +211,11 @@ class phony_master_driver extends master_axi_pipeline_driver;
         vmif.BID <= 0;
         vmif.BRESP <= axi_m.resp;
         vmif.BVALID <= 1;
-        vmif.BUSER <= 0;
+        vmif.BUSER <= axi_m.user;
 
         @(vmif.m_drv_cb); // progress time
         vmif.BVALID <= 0;
-        @(vmif.m_drv_cb); // progress time
+        // @(vmif.m_drv_cb); // progress time
     endtask
     
 
@@ -255,7 +255,7 @@ class phony_master_driver extends master_axi_pipeline_driver;
 
         task run_phase(uvm_phase phase);
             `uvm_info("DRIVER CLASS", "Run Phase", UVM_HIGH)
-            dut_rst();
+            // dut_rst();
             // intial_inputs();
             forever begin
                 pkt = master_seqit#(DATA_WIDTH)::type_id::create("pkt");

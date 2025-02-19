@@ -27,126 +27,88 @@ class master_monitor extends uvm_monitor;
         end
     endfunction
 
+    task intial_vals(master_seqit item);
+        item.address <= '1;
+        item.command <= WRITE;
+        item.data <= '0; // no data on the read addr channel TODO CHANGE WRONG
+        item.BURST_length <= '1;
+        item.ready <= '1;
+        item.valid <= '1;
+        item.BURST_type <= TYPE_BURST'('1);
+        item.CACHE <= '1;
+        item.LOCK <= '1;
+        item.BURST_size <='1;
+        item.prot <= '1;
+        item.nRST <= vmif.nRST;
+
+        // outputs 
+        item.out_data <= '0; // no data its an addr channel TODO CHANGE WRONG
+        item.out_addr <= '1; // addr is an output 
+        item.out_qos <= '1; // 
+        item.out_region <= '1; // 
+        item.out_user <= '1; // 
+    endtask
+
+    task set_vals(master_seqit item);
+        item.address = vmif.AWADDR;
+        item.command = WRITE;
+        item.data = vmif.WDATA; 
+        item.BURST_length = vmif.AWLEN;
+        item.ready = vmif.RREADY;
+        item.valid = vmif.AWVALID;
+        item.BURST_type = TYPE_BURST'(vmif.AWBURST);
+        item.CACHE = vmif.AWCACHE;
+        item.LOCK = vmif.AWLOCK;
+        item.BURST_size = vmif.AWSIZE;
+        item.prot = vmif.AWPROT;
+        item.nRST = vmif.nRST;
+        item.out_data = vmif.WDATA; // no data its an addr channel TODO CHANGE WRONG
+        item.out_addr = vmif.AWADDR; // addr is an output 
+        item.out_qos = vmif.AWQOS; 
+        item.out_region = vmif.AWREGION; 
+        item.out_user = vmif.AWUSER;  
+    endtask
+
+    task set_vals2(master_seqit item);
+        item.address = vmif.ARADDR;
+        item.command = READ;
+        item.data = vmif.WDATA; 
+        item.BURST_length = vmif.ARLEN;
+        item.ready = vmif.RREADY;
+        item.valid = vmif.ARVALID;
+        item.BURST_type = TYPE_BURST'(vmif.ARBURST);
+        item.CACHE = vmif.ARCACHE;
+        item.LOCK = vmif.ARLOCK;
+        item.BURST_size = vmif.ARSIZE;
+        item.prot = vmif.ARPROT;
+        item.nRST = vmif.nRST;
+        item.out_data = vmif.WDATA; // no data its an addr channel TODO CHANGE WRONG
+        item.out_addr = vmif.ARADDR; // addr is an output 
+        item.out_qos = vmif.ARQOS; 
+        item.out_region = vmif.ARREGION; 
+        item.out_user = vmif.ARUSER;  
+    endtask
+
     virtual task run_phase(uvm_phase phase);
         super.run_phase(phase);
-
-        `uvm_info("MONITOR CLASS", "Run Phase", UVM_HIGH)
+        // wait(vmif.nRST == 1'b1); // Wait until reset is de-asserted
+        `uvm_info("MONITOR CLASS", "Run Phase", UVM_NONE)
         forever begin
             master_seqit item; // Previous transaction
             item = master_seqit#(DATA_WIDTH)::type_id::create("item");
-            
-            item.nRST = vmif.nRST;
-            
             @(vmif.m_drv_cb);
-
-            // READ ADDR
-            if(vmif.ARVALID && vmif.ARREADY) begin              
-                // inputs (TECHNICALLY OUTS ALSO NEED TO LOOK INTO)
-                item.address <= vmif.ARADDR;
-                item.command <= READ;
-                item.data <= '0; // no data on the read addr channel TODO CHANGE WRONG
-                item.BURST_length <= vmif.ARLEN;
-                item.ready <= vmif.ARREADY;
-                item.valid <= vmif.ARVALID;
-                item.BURST_type <= TYPE_BURST'(vmif.ARBURST);
-                item.CACHE <= vmif.ARCACHE;
-                item.LOCK <= vmif.ARLOCK;
-                item.BURST_size <= vmif.ARSIZE;
-                item.prot <= vmif.ARPROT;
-
-                // outputs 
-                item.out_data <= '0; // no data its an addr channel TODO CHANGE WRONG
-                item.out_addr <= vmif.ARADDR; // addr is an output 
-                // item.out_resp <= OKAY; // not used here
-            end
-
-            // WRITE ADDR
-            if(vmif.AWVALID && vmif.AWREADY) begin              
-                // inputs (TECHNICALLY OUTS ALSO NEED TO LOOK INTO)
-                item.address <= vmif.AWADDR;
-                item.command <= WRITE;
-                item.data <= '0; // no data on the write addr channel TODO CHANGE WRONG
-                item.BURST_length <= vmif.AWLEN;
-                item.ready <= vmif.AWREADY;
-                item.valid <= vmif.AWVALID;
-                item.BURST_type <= TYPE_BURST'(vmif.AWBURST);
-                item.CACHE <= vmif.AWCACHE;
-                item.LOCK <= vmif.AWLOCK;
-                item.BURST_size <= vmif.AWSIZE;
-                item.prot <= vmif.AWPROT;
-
-                // outputs 
-                item.out_data <= '0; // no data its an addr channel TODO CHANGE WRONF
-                item.out_addr <= vmif.AWADDR; // addr is an output 
-                // item.out_resp <= OKAY; // not used here
-            end
-
-            // READ DATA
-            if(vmif.RVALID && vmif.RREADY) begin
-                item.address <= 0; // not relevant
-                item.command <= READ;
-                item.Channel <= DATA;
-                item.data <= 0; // irrelevant todo change wrong
-                item.out_data <= vmif.RDATA;
-                item.BURST_length <= vmif.ARLEN; // TODO tricky logic gere not simple come back to this 
-                item.ready <= vmif.RREADY;
-                item.valid <= vmif.RVALID;
-                item.BURST_type <= TYPE_BURST'(vmif.ARBURST); // not sure what to do with this field
-                item.CACHE <= vmif.ARCACHE; // not sure
-                item.LOCK <= vmif.ARLOCK; // not sure
-                item.BURST_size <= vmif.ARSIZE; // not sure
-                item.prot <= vmif.ARPROT; // not sure
-            end
-
-            // WRITE DATA
-            if(vmif.WVALID && vmif.WREADY) begin
-                item.address <= 0; // not relevant
-                item.command <= WRITE;
-                item.Channel <= DATA;
-                item.data <= vmif.WDATA;
-                item.BURST_length <= vmif.AWLEN; // TODO tricky logic gere not simple come back to this 
-                item.ready <= vmif.WREADY;
-                item.valid <= vmif.WVALID;
-                item.BURST_type <= TYPE_BURST'(vmif.AWBURST); // not sure what to do with this field
-                item.CACHE <= vmif.AWCACHE; // not sure
-                item.LOCK <= vmif.AWLOCK; // not sure
-                item.BURST_size <= vmif.AWSIZE; // not sure
-                item.prot <= vmif.AWPROT; // not sure
-            end
-
-
-            if(item.command == READ && item.Channel == DATA) begin
-                int idx = 1;
-                repeat(vmif.ARLEN + 1) begin // TODO back I think this is incorrect
-                    while(!vmif.RVALID && !vmif.RREADY) begin
-                        @(vmif.m_drv_cb); // wait till valid go high
-                    end
-
-                    item.out_data[idx] <= vmif.RDATA;
-
-                    if(idx == vmif.ARLEN - 1) begin
-                        item.Channel <= RDONE; // needed so I do not get stuck in if construct
-                        break; // kill the loop 
-                    end
-                end
-            end
-
-            if(item.command == WRITE && item.Channel == DATA) begin
-                int idx = 1;
-                repeat(vmif.AWLEN + 1) begin // TODO COME BACK MAYBE WRONG 
-                    while(!vmif.WVALID && !vmif.WREADY) begin
-                        @(vmif.m_drv_cb); // wait till valid go high
-                    end
-
-                    item.out_data[idx] = vmif.WDATA;
-
-                    if(idx == vmif.AWBURST - 1) begin
-                        item.Channel <= WDONE; // needed so I do not get stuck in if construct
-                        break; // kill the loop 
-                    end
-                end
-            end
-
+            @(vmif.m_drv_cb);
+            // NOTE I think issue is I need to syncronize twice because at the falling edge of nRST it samples but the DUT has not seen nRST low at a posedge 
+            // TODO CONFIRM ABOVE STATEMENT
+            set_vals2(item); // reset values 
+            // NOTE if nRST you should have to wait an extra clk
+            // if(vmif.nRST == 0) begin
+            //     // $display("Before calling intial_vals %t", $time);
+            //     // @(vmif.m_drv_cb);
+            //     // reset_vals(item); // reset values 
+            //     // $display("After calling intial_vals, addr=%h, data=%h at time %0t", item.address, item.data,$time);            
+            // end
+            // $display("VALS SENT, addr=%h, nRST=%h at time %0t", item.address, item.nRST,$time);            
             result_ap.write(item); // write to SB
         end
         

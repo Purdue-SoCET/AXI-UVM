@@ -5,7 +5,6 @@ import uvm_pkg::*;
 `include "Sequences/master_rst_sequence.svh"
 `include "axi_master_if.svh"
 `include "phony_master_driver.svh"
-`include "phony_master_monitor.svh"
 
 class master_test extends uvm_test;
 
@@ -32,8 +31,8 @@ class master_test extends uvm_test;
         set_type_override_by_type(master_axi_pipeline_driver::get_type(),phony_master_driver::get_type());
 
         
-         // overiding monitor to phoney monitor for rst case
-        set_type_override_by_type(master_monitor::get_type(),phony_master_monitor::get_type());
+        //  // overiding monitor to phoney monitor for rst case
+        // set_type_override_by_type(master_monitor::get_type(),phony_master_monitor::get_type());
 
         
         // passing interface down
@@ -63,15 +62,15 @@ class master_test extends uvm_test;
         
         // garb_seq.start(m_env.m_agt.m_sqr); // send garbage sequence
         // rst_seq.start(m_env.m_agt.m_sqr); // send reset sequence
-        // repeat(100) begin
-            // repeat(8) begin
-            garb_seq.start(m_env.m_agt.m_sqr); // send garbage sequence
-            // end
+        repeat(100) begin
+            repeat(8) begin
+                garb_seq.start(m_env.m_agt.m_sqr); // send garbage sequence
+            end
             // #(100ns);
             // rst_seq.print(); // print values 
             rst_seq.start(m_env.m_agt.m_sqr); // send reset sequence
-        // end
-        #(100ns);
+        end
+        // #(100ns);
 
         // TC 2
         phase.drop_objection(this, "Finished sequences");

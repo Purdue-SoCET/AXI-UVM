@@ -25,7 +25,8 @@ class master_seqit #(parameter DATA_WIDTH = DATA_WIDTH) extends uvm_sequence_ite
     rand bit LOCK;
     rand bit [2:0] BURST_size; // how many bites per transfer
     rand bit [2:0] prot; // normal vs privelaged protection and secure vs non secure 
-    rand TYPE_RESP resp; // response
+    rand TYPE_RESP resp; // response]
+    rand logic [31:0] user;
 
     // Outputs
     logic [DATA_WIDTH - 1:0] out_data; // data outputed

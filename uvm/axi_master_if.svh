@@ -134,13 +134,13 @@ endclocking
 
 // TODO ADD ASSERTIONS WHEN I KNOW THE SPECIFICATIONS OF THE DUT
 // NOTE for now WDATA == '1
-property nrst_success;
-    (@(m_drv_cb) $fell(nRST) |=> (AWVALID == 0 && AWSIZE == 0 && AWBURST == 0 && AWCACHE == 0 &&
-    AWPROT == 0 && AWID == 0 && AWLEN == 0 && AWLOCK == 0 && AWQOS == 0 && AWREGION == 0 && AWUSER == 0 &&
-    WVALID == 0 && WLAST == 0 && WDATA == '1 && WSTRB == 0 && WUSER == 0 &&
-    ARADDR == 0 && ARSIZE == 0 && ARBURST == 0 && ARCACHE == 0 && ARPROT == 0 && ARID == 0 && ARLEN == 0 &&
-    ARLOCK == 0 && ARQOS == 0 && ARREGION == 0 && ARUSER == 0 && RREADY == 0));
-endproperty 
+// property nrst_success;
+//     (@(m_drv_cb) $fell(nRST) |=> (AWVALID == 0 && AWSIZE == 0 && AWBURST == 0 && AWCACHE == 0 &&
+//     AWPROT == 0 && AWID == 0 && AWLEN == 0 && AWLOCK == 0 && AWQOS == 0 && AWREGION == 0 && AWUSER == 0 &&
+//     WVALID == 0 && WLAST == 0 && WDATA == '1 && WSTRB == 0 && WUSER == 0 &&
+//     ARADDR == 0 && ARSIZE == 0 && ARBURST == 0 && ARCACHE == 0 && ARPROT == 0 && ARID == 0 && ARLEN == 0 &&
+//     ARLOCK == 0 && ARQOS == 0 && ARREGION == 0 && ARUSER == 0 && RREADY == 0));
+// endproperty 
 
 
 endinterface
