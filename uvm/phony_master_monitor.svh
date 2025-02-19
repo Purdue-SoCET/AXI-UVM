@@ -17,6 +17,7 @@ class phony_master_monitor extends master_monitor;
 
     function new(string name = "phony_master_monitor", uvm_component parent = null);
         super.new(name,parent);
+        `uvm_info("PHONEY_MONITOR", "phony_master_monitor constructor called", UVM_MEDIUM)
     endfunction //new()
 
     virtual function void build_phase(uvm_phase phase);
@@ -67,8 +68,8 @@ class phony_master_monitor extends master_monitor;
 
     virtual task run_phase(uvm_phase phase);
         super.run_phase(phase);
-        wait(vmif.m_drv_cb.nRST == 1'b1); // Wait until reset is de-asserted
-        `uvm_info("MONITOR CLASS", "Run Phase", UVM_LOW)
+        // wait(vmif.m_drv_cb.nRST == 1'b1); // Wait until reset is de-asserted
+        `uvm_info("MONITOR CLASS", "Run Phase", UVM_NONE)
         forever begin
             master_seqit item; // Previous transaction
             item = master_seqit#(DATA_WIDTH)::type_id::create("item");

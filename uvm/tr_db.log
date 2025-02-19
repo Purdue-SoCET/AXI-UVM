@@ -60,3 +60,11 @@
   CREATE_STREAM @90000 {NAME:rst_seq T:Transactions SCOPE:uvm_test_top.m_env.m_agt.m_seq STREAM:676}
   CREATE_STREAM @0 {NAME:garb_seq T:Transactions SCOPE:uvm_test_top.m_env.m_agt.m_seq STREAM:607}
   CREATE_STREAM @90000 {NAME:rst_seq T:Transactions SCOPE:uvm_test_top.m_env.m_agt.m_seq STREAM:676}
+  CREATE_STREAM @0 {NAME:garb_seq T:Transactions SCOPE:uvm_test_top.m_env.m_agt.m_seq STREAM:609}
+  CREATE_STREAM @90000 {NAME:rst_seq T:Transactions SCOPE:uvm_test_top.m_env.m_agt.m_seq STREAM:678}
+  CREATE_STREAM @0 {NAME:garb_seq T:Transactions SCOPE:uvm_test_top.m_env.m_agt.m_seq STREAM:609}
+  CREATE_STREAM @90000 {NAME:rst_seq T:Transactions SCOPE:uvm_test_top.m_env.m_agt.m_seq STREAM:678}
+  CREATE_STREAM @0 {NAME:garb_seq T:Transactions SCOPE:uvm_test_top.m_env.m_agt.m_seq STREAM:609}
+  CREATE_STREAM @90000 {NAME:rst_seq T:Transactions SCOPE:uvm_test_top.m_env.m_agt.m_seq STREAM:678}
+  CREATE_STREAM @0 {NAME:garb_seq T:Transactions SCOPE:uvm_test_top.m_env.m_agt.m_seq STREAM:609}
+  CREATE_STREAM @90000 {NAME:rst_seq T:Transactions SCOPE:uvm_test_top.m_env.m_agt.m_seq STREAM:678}
