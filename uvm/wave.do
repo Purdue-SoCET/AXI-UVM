@@ -31,39 +31,39 @@ add wave -noupdate -expand -group {Master side CPU inputs} -expand -group {Read 
 add wave -noupdate -expand -group {Master side CPU inputs} -expand -group {Read data resp} /axi_master_duv_tb/amif/RRESP
 add wave -noupdate -expand -group {Master side CPU inputs} -expand -group {Read data resp} /axi_master_duv_tb/amif/RID
 add wave -noupdate -expand -group {Master side CPU inputs} -expand -group {Read data resp} /axi_master_duv_tb/amif/RUSER
-add wave -noupdate -expand -group Outputs -group {write address out} /axi_master_duv_tb/amif/AWVALID
-add wave -noupdate -expand -group Outputs -group {write address out} /axi_master_duv_tb/amif/AWLEN
-add wave -noupdate -expand -group Outputs -group {write address out} /axi_master_duv_tb/amif/AWADDR
-add wave -noupdate -expand -group Outputs -group {write address out} /axi_master_duv_tb/amif/AWSIZE
-add wave -noupdate -expand -group Outputs -group {write address out} /axi_master_duv_tb/amif/AWBURST
-add wave -noupdate -expand -group Outputs -group {write address out} /axi_master_duv_tb/amif/AWCACHE
-add wave -noupdate -expand -group Outputs -group {write address out} /axi_master_duv_tb/amif/AWPROT
-add wave -noupdate -expand -group Outputs -group {write address out} /axi_master_duv_tb/amif/AWID
-add wave -noupdate -expand -group Outputs -group {write address out} /axi_master_duv_tb/amif/AWLOCK
-add wave -noupdate -expand -group Outputs -group {write address out} /axi_master_duv_tb/amif/AWQOS
-add wave -noupdate -expand -group Outputs -group {write address out} /axi_master_duv_tb/amif/AWREGION
-add wave -noupdate -expand -group Outputs -group {write address out} /axi_master_duv_tb/amif/AWUSER
-add wave -noupdate -expand -group Outputs -group {Write data out} /axi_master_duv_tb/amif/WVALID
-add wave -noupdate -expand -group Outputs -group {Write data out} /axi_master_duv_tb/amif/WLAST
-add wave -noupdate -expand -group Outputs -group {Write data out} /axi_master_duv_tb/amif/WDATA
-add wave -noupdate -expand -group Outputs -group {Write data out} /axi_master_duv_tb/amif/WSTRB
-add wave -noupdate -expand -group Outputs -group {Write data out} /axi_master_duv_tb/amif/WUSER
+add wave -noupdate -expand -group Outputs -expand -group {write address out} /axi_master_duv_tb/amif/AWVALID
+add wave -noupdate -expand -group Outputs -expand -group {write address out} /axi_master_duv_tb/amif/AWLEN
+add wave -noupdate -expand -group Outputs -expand -group {write address out} /axi_master_duv_tb/amif/AWADDR
+add wave -noupdate -expand -group Outputs -expand -group {write address out} /axi_master_duv_tb/amif/AWSIZE
+add wave -noupdate -expand -group Outputs -expand -group {write address out} /axi_master_duv_tb/amif/AWBURST
+add wave -noupdate -expand -group Outputs -expand -group {write address out} /axi_master_duv_tb/amif/AWCACHE
+add wave -noupdate -expand -group Outputs -expand -group {write address out} /axi_master_duv_tb/amif/AWPROT
+add wave -noupdate -expand -group Outputs -expand -group {write address out} /axi_master_duv_tb/amif/AWID
+add wave -noupdate -expand -group Outputs -expand -group {write address out} /axi_master_duv_tb/amif/AWLOCK
+add wave -noupdate -expand -group Outputs -expand -group {write address out} /axi_master_duv_tb/amif/AWQOS
+add wave -noupdate -expand -group Outputs -expand -group {write address out} /axi_master_duv_tb/amif/AWREGION
+add wave -noupdate -expand -group Outputs -expand -group {write address out} /axi_master_duv_tb/amif/AWUSER
+add wave -noupdate -expand -group Outputs -expand -group {Write data out} /axi_master_duv_tb/amif/WVALID
+add wave -noupdate -expand -group Outputs -expand -group {Write data out} /axi_master_duv_tb/amif/WLAST
+add wave -noupdate -expand -group Outputs -expand -group {Write data out} /axi_master_duv_tb/amif/WDATA
+add wave -noupdate -expand -group Outputs -expand -group {Write data out} /axi_master_duv_tb/amif/WSTRB
+add wave -noupdate -expand -group Outputs -expand -group {Write data out} /axi_master_duv_tb/amif/WUSER
 add wave -noupdate -expand -group Outputs /axi_master_duv_tb/amif/BREADY
-add wave -noupdate -expand -group Outputs -group {Read address out} /axi_master_duv_tb/amif/ARVALID
-add wave -noupdate -expand -group Outputs -group {Read address out} /axi_master_duv_tb/amif/ARADDR
-add wave -noupdate -expand -group Outputs -group {Read address out} /axi_master_duv_tb/amif/ARSIZE
-add wave -noupdate -expand -group Outputs -group {Read address out} /axi_master_duv_tb/amif/ARBURST
-add wave -noupdate -expand -group Outputs -group {Read address out} /axi_master_duv_tb/amif/ARCACHE
-add wave -noupdate -expand -group Outputs -group {Read address out} /axi_master_duv_tb/amif/ARPROT
-add wave -noupdate -expand -group Outputs -group {Read address out} /axi_master_duv_tb/amif/ARID
-add wave -noupdate -expand -group Outputs -group {Read address out} /axi_master_duv_tb/amif/ARLEN
-add wave -noupdate -expand -group Outputs -group {Read address out} /axi_master_duv_tb/amif/ARLOCK
-add wave -noupdate -expand -group Outputs -group {Read address out} /axi_master_duv_tb/amif/ARQOS
-add wave -noupdate -expand -group Outputs -group {Read address out} /axi_master_duv_tb/amif/ARREGION
-add wave -noupdate -expand -group Outputs -group {Read address out} /axi_master_duv_tb/amif/ARUSER
+add wave -noupdate -expand -group Outputs -expand -group {Read address out} /axi_master_duv_tb/amif/ARVALID
+add wave -noupdate -expand -group Outputs -expand -group {Read address out} /axi_master_duv_tb/amif/ARADDR
+add wave -noupdate -expand -group Outputs -expand -group {Read address out} /axi_master_duv_tb/amif/ARSIZE
+add wave -noupdate -expand -group Outputs -expand -group {Read address out} /axi_master_duv_tb/amif/ARBURST
+add wave -noupdate -expand -group Outputs -expand -group {Read address out} /axi_master_duv_tb/amif/ARCACHE
+add wave -noupdate -expand -group Outputs -expand -group {Read address out} /axi_master_duv_tb/amif/ARPROT
+add wave -noupdate -expand -group Outputs -expand -group {Read address out} /axi_master_duv_tb/amif/ARID
+add wave -noupdate -expand -group Outputs -expand -group {Read address out} /axi_master_duv_tb/amif/ARLEN
+add wave -noupdate -expand -group Outputs -expand -group {Read address out} /axi_master_duv_tb/amif/ARLOCK
+add wave -noupdate -expand -group Outputs -expand -group {Read address out} /axi_master_duv_tb/amif/ARQOS
+add wave -noupdate -expand -group Outputs -expand -group {Read address out} /axi_master_duv_tb/amif/ARREGION
+add wave -noupdate -expand -group Outputs -expand -group {Read address out} /axi_master_duv_tb/amif/ARUSER
 add wave -noupdate -expand -group Outputs /axi_master_duv_tb/amif/RREADY
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 2} {108142 ps} 0}
+WaveRestoreCursors {{Cursor 2} {131110 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 150
 configure wave -valuecolwidth 100

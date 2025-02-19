@@ -9,7 +9,7 @@ import uvm_pkg::*;
 
 
 class master_seqit #(parameter DATA_WIDTH = DATA_WIDTH) extends uvm_sequence_item; 
-    // `uvm_object_utils(master_seqit)
+    `uvm_object_utils(master_seqit)
 
     // For now I am asuming these are all inputs 
     rand TYPE_CHANNEL Channel; // channel (addr,write/read,resp)
@@ -27,32 +27,35 @@ class master_seqit #(parameter DATA_WIDTH = DATA_WIDTH) extends uvm_sequence_ite
     rand bit [2:0] prot; // normal vs privelaged protection and secure vs non secure 
     rand TYPE_RESP resp; // response
 
-    // Outputs todo
+    // Outputs
     logic [DATA_WIDTH - 1:0] out_data; // data outputed
     logic [31:0] out_addr; // addr outputed
+    logic out_qos;
+    logic [3:0] out_region;
+    logic [31:0] out_user;
     // TYPE_RESP out_resp; // MOVED RESPONSE TO INPUT SIDE
 
 
-`uvm_object_utils_begin(master_seqit)
-    //inputs 
-    `uvm_field_enum(TYPE_CHANNEL,Channel, UVM_ALL_ON)
-    `uvm_field_int(address, UVM_ALL_ON)
-    `uvm_field_enum(TYPE_TRANS,command, UVM_ALL_ON)
-    `uvm_field_int(data, UVM_ALL_ON)
-    `uvm_field_int(BURST_length, UVM_ALL_ON)
-    `uvm_field_int(nRST, UVM_ALL_ON)
-    `uvm_field_int(ready, UVM_ALL_ON)
-    `uvm_field_int(valid, UVM_ALL_ON)
-    `uvm_field_enum(TYPE_BURST,BURST_type, UVM_ALL_ON)
-    `uvm_field_int(CACHE, UVM_ALL_ON)
-    `uvm_field_int(LOCK, UVM_ALL_ON)
-    `uvm_field_int(BURST_size, UVM_ALL_ON)
-    `uvm_field_int(prot, UVM_ALL_ON)
+// `uvm_object_utils_begin(master_seqit)
+//     //inputs 
+//     `uvm_field_enum(TYPE_CHANNEL,Channel, UVM_ALL_ON)
+//     `uvm_field_int(address, UVM_ALL_ON)
+//     `uvm_field_enum(TYPE_TRANS,command, UVM_ALL_ON)
+//     `uvm_field_int(data, UVM_ALL_ON)
+//     `uvm_field_int(BURST_length, UVM_ALL_ON)
+//     `uvm_field_int(nRST, UVM_ALL_ON)
+//     `uvm_field_int(ready, UVM_ALL_ON)
+//     `uvm_field_int(valid, UVM_ALL_ON)
+//     `uvm_field_enum(TYPE_BURST,BURST_type, UVM_ALL_ON)
+//     `uvm_field_int(CACHE, UVM_ALL_ON)
+//     `uvm_field_int(LOCK, UVM_ALL_ON)
+//     `uvm_field_int(BURST_size, UVM_ALL_ON)
+//     `uvm_field_int(prot, UVM_ALL_ON)
     
-    // Outputs 
-    `uvm_field_int(out_data, UVM_DEFAULT)
-    `uvm_field_int(out_addr, UVM_DEFAULT)
-`uvm_object_utils_end
+//     // Outputs 
+//     `uvm_field_int(out_data, UVM_DEFAULT)
+//     `uvm_field_int(out_addr, UVM_DEFAULT)
+// `uvm_object_utils_end
 
     // Trying to keep track of what type of tranaction have been sent 
     static bit addr_type_sent = 0;
@@ -100,7 +103,7 @@ class master_seqit #(parameter DATA_WIDTH = DATA_WIDTH) extends uvm_sequence_ite
     }
 
     constraint channel_cons { // I think this maybe a redundant constraint
-        Channel inside {ADDRESS, DATA};
+        Channel inside {ADDRESS, DATA, RESPONSE};
     }
 
     // Gone because not using payload type to simplify life

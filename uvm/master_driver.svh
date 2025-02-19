@@ -113,7 +113,7 @@ class master_axi_pipeline_driver extends uvm_driver #(master_seqit);
     
 
         task run_phase(uvm_phase phase);
-            `uvm_info("DRIVER CLASS", "Run Phase", UVM_HIGH)
+            `uvm_info("DRIVER CLASS", "Run Phase", UVM_LOW)
             
             forever begin
                 pkt = master_seqit#(DATA_WIDTH)::type_id::create("pkt");
