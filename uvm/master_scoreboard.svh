@@ -13,6 +13,7 @@ class master_scoreboard extends uvm_scoreboard;
 
     int m_matches;
     int m_mismatches;
+    int num_trans;
     uvm_analysis_imp #(master_seqit, master_scoreboard) scoreboard_port;
     master_seqit transactions[$]; // dynamic array may need for later
 
@@ -26,6 +27,7 @@ class master_scoreboard extends uvm_scoreboard;
         scoreboard_port = new("scoreboard_port", this);
         m_matches = 0;
         m_mismatches = 0;
+        num_trans = 0;
     endfunction : build_phase
 
     function void write(master_seqit item);
@@ -42,6 +44,7 @@ class master_scoreboard extends uvm_scoreboard;
         master_seqit curr_tx;
         wait((transactions.size() != 0));
         curr_tx = transactions.pop_front();
+        num_trans++;
         // $display("SCORE BOARD curr_tx.nRST == %d at time %t", curr_tx.nRST, $time);
         if(curr_tx.nRST !== 1'bx) begin
             compare(curr_tx);
@@ -196,5 +199,6 @@ class master_scoreboard extends uvm_scoreboard;
     function void report_phase(uvm_phase phase);
         uvm_report_info("Comparator", $sformatf("Matches:    %0d", m_matches));
         uvm_report_info("Comparator", $sformatf("Mismatches: %0d", m_mismatches));
+        uvm_report_info("Num trans", $sformatf("Number of transactions: %0d", num_trans));
     endfunction
 endclass //master_scoreboard extends uvm_scoreboard

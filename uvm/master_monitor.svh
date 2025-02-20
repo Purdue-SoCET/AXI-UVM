@@ -110,6 +110,10 @@ class master_monitor extends uvm_monitor;
             // end
             // $display("VALS SENT, addr=%h, nRST=%h at time %0t", item.address, item.nRST,$time);            
             result_ap.write(item); // write to SB
+
+            set_vals(item); // reset values 
+            result_ap.write(item); // write to SB
+
         end
         
     endtask : run_phase
